@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [programacion, test, deployed]
+  push:
+    branches: [programacion]
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: Build & Test
+        run: |
+          if [ -f pom.xml ]; then
+            mvn verify -B
+          else
+            echo "No pom.xml found — skipping backend build"
+          fi
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install & Build
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build --if-present
+          else
+            echo "No package.json found — skipping frontend build"
+          fi
