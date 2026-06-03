@@ -16,7 +16,7 @@
 | 10 | Endpoint `/auth/tenant-config` — devuelve logo_url, color_primario, color_secundario del tenant | Backend | #7 |
 | 11 | Integration tests del Sprint 01 | Testing | #7, #8, #9 |
 
-## Jeremy — Backend Fullstack
+## Jeremy — Backend 
 
 | # | Tarea | Endpoint | Depende de |
 |:---:|---|---|:---:|
@@ -28,7 +28,7 @@
 | 6 | Dashboard KPIs | `GET /dashboard/kpis` | OTs y stock funcionales |
 | 7 | Unit tests de sus módulos | Testing | — |
 
-## Juan Diego — Backend Fullstack
+## Juan Diego — Backend 
 
 | # | Tarea | Endpoint | Depende de |
 |:---:|---|---|:---:|

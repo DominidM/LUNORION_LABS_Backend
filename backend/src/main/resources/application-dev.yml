@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lunorion_labs_dev
+
+jwt:
+  secret: dev-secret-key-not-for-production

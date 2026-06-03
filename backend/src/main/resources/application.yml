@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: lunorion-labs
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lunorion_labs
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: public
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:lunorion-labs-secret-key-change-in-production}
+  expiration: 86400000
