@@ -5,7 +5,7 @@ spring:
     show-sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lunorion_labs_dev
+    url: jdbc:postgresql://localhost:5432/lunorion_db
 
 jwt:
   secret: dev-secret-key-not-for-production
