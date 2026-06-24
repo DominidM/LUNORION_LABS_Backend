@@ -8,9 +8,9 @@ spring:
         format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lunorion_db
-    username: postgres
-    password: dominid
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 jwt:
   secret: dev-secret-key-not-for-production
