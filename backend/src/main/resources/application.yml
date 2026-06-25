@@ -1,16 +1,18 @@
 spring:
   application:
     name: lunorion-labs
+  profiles:
+    active: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lunorion_labs
-    username: postgres
-    password: postgres
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:

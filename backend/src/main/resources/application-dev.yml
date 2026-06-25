@@ -3,9 +3,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lunorion_labs_dev
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 jwt:
   secret: dev-secret-key-not-for-production
+  expiration: 86400000
+
+server:
+  port: 8080
