@@ -1,14 +1,26 @@
 package com.lunorion.labs.core.cliente.application.dto.in;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Request para crear o actualizar un cliente")
 public class CreateClienteRequest {
+    @Schema(description = "ID del tenant", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     private String tenantId;
+    @Schema(description = "Tipo de documento (DNI, RUC, etc.)", example = "DNI")
     private String tipoDocumento;
+    @Schema(description = "Número de documento", example = "12345678")
     private String numeroDocumento;
+    @Schema(description = "Nombres", example = "Juan")
     private String nombres;
+    @Schema(description = "Apellidos", example = "Pérez")
     private String apellidos;
+    @Schema(description = "Razón social (para empresas)", example = "Empresa SAC")
     private String razonSocial;
+    @Schema(description = "Dirección", example = "Av. Principal 123")
     private String direccion;
+    @Schema(description = "Teléfono", example = "999888777")
     private String telefono;
+    @Schema(description = "Email", example = "juan@email.com")
     private String email;
 
     public String getTenantId() { return tenantId; }

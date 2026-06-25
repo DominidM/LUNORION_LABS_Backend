@@ -16,7 +16,8 @@ public class VehiculoMapper {
             request.getModelo(),
             request.getAnio(),
             request.getColor(),
-            request.getNumeroVin(),
+            request.getNumeroChasis(),
+            request.getNumeroMotor(),
             request.getClienteId()
         );
     }
@@ -30,7 +31,8 @@ public class VehiculoMapper {
         response.setModelo(vehiculo.getModelo());
         response.setAnio(vehiculo.getAnio());
         response.setColor(vehiculo.getColor());
-        response.setNumeroVin(vehiculo.getNumeroVin());
+        response.setNumeroChasis(vehiculo.getNumeroChasis());
+        response.setNumeroMotor(vehiculo.getNumeroMotor());
         response.setClienteId(vehiculo.getClienteId());
         response.setActivo(vehiculo.isActivo());
         return response;

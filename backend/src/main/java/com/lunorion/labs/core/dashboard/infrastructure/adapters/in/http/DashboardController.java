@@ -3,6 +3,8 @@ package com.lunorion.labs.core.dashboard.infrastructure.adapters.in.http;
 import com.lunorion.labs.core.dashboard.application.dto.out.KpiResponse;
 import com.lunorion.labs.core.dashboard.application.dto.out.RentabilidadResponse;
 import com.lunorion.labs.core.dashboard.domain.ports.in.IDashboardQueryPort;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@Tag(name = "Dashboard", description = "Indicadores y reportes del dashboard")
 public class DashboardController {
 
     private final IDashboardQueryPort dashboardQueryPort;
@@ -24,12 +27,14 @@ public class DashboardController {
     }
 
     @GetMapping("/kpis")
+    @Operation(summary = "Obtener KPIs", description = "Retorna indicadores clave: facturación del día, OTs abiertas, stock crítico, citas hoy, ingresos/egresos del mes")
     public ResponseEntity<KpiResponse> obtenerKpis(@RequestParam("tenantId") String tenantId) {
         KpiResponse response = dashboardQueryPort.obtenerKpis(tenantId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/rentabilidad")
+    @Operation(summary = "Obtener rentabilidad", description = "Retorna rentabilidad agregada por tipo de servicio")
     public ResponseEntity<List<RentabilidadResponse>> obtenerRentabilidad(
             @RequestParam("tenantId") String tenantId) {
         List<RentabilidadResponse> response = dashboardQueryPort.obtenerRentabilidad(tenantId);
@@ -37,6 +42,7 @@ public class DashboardController {
     }
 
     @GetMapping("/exportar")
+    @Operation(summary = "Exportar reporte", description = "Exporta un reporte en formato PDF o XLSX")
     public ResponseEntity<byte[]> exportarReporte(
             @RequestParam("tenantId") String tenantId,
             @RequestParam("formato") String formato,

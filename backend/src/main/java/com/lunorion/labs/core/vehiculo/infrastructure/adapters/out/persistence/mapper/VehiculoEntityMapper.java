@@ -18,7 +18,8 @@ public class VehiculoEntityMapper {
         entity.setModelo(domain.getModelo());
         entity.setAnio(domain.getAnio());
         entity.setColor(domain.getColor());
-        entity.setNumeroVin(domain.getNumeroVin());
+        entity.setNumeroChasis(domain.getNumeroChasis());
+        entity.setNumeroMotor(domain.getNumeroMotor());
         entity.setClienteId(domain.getClienteId());
         entity.setActivo(domain.isActivo());
         entity.setCreatedAt(domain.getCreatedAt());
@@ -35,7 +36,8 @@ public class VehiculoEntityMapper {
                 entity.getModelo(),
                 entity.getAnio(),
                 entity.getColor(),
-                entity.getNumeroVin(),
+                entity.getNumeroChasis(),
+                entity.getNumeroMotor(),
                 entity.getClienteId(),
                 entity.isActivo()
         );

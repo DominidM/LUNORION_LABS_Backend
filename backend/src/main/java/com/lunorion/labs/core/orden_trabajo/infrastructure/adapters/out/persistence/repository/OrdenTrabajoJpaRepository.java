@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface OrdenTrabajoJpaRepository extends JpaRepository<OrdenTrabajoEntity, UUID> {
     List<OrdenTrabajoEntity> findByTenantId(UUID tenantId);
     List<OrdenTrabajoEntity> findByEstadoAndTenantId(String estado, UUID tenantId);
+    List<OrdenTrabajoEntity> findByClienteId(UUID clienteId);
 }

@@ -38,7 +38,8 @@ public class VehiculoCommandService implements IVehiculoCommandPort {
             request.getModelo(),
             request.getAnio(),
             request.getColor(),
-            request.getNumeroVin(),
+            request.getNumeroChasis(),
+            request.getNumeroMotor(),
             request.getClienteId()
         );
         Vehiculo saved = repository.save(vehiculo);

@@ -12,5 +12,6 @@ public interface CitaJpaRepository extends JpaRepository<CitaEntity, UUID> {
     List<CitaEntity> findByClienteId(String clienteId);
     List<CitaEntity> findByTecnicoId(String tecnicoId);
     List<CitaEntity> findByFechaHoraBetween(LocalDateTime desde, LocalDateTime hasta);
+    List<CitaEntity> findByTenantIdAndFechaHoraBetween(UUID tenantId, LocalDateTime desde, LocalDateTime hasta);
     List<CitaEntity> findByTecnicoIdAndFechaHoraBetween(String tecnicoId, LocalDateTime desde, LocalDateTime hasta);
 }

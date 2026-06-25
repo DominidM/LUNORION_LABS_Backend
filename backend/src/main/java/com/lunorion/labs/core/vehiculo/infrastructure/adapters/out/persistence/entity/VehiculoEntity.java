@@ -20,8 +20,11 @@ public class VehiculoEntity {
     private Integer anio;
     private String color;
 
-    @Column(name = "numero_vin")
-    private String numeroVin;
+    @Column(name = "numero_chasis")
+    private String numeroChasis;
+
+    @Column(name = "numero_motor")
+    private String numeroMotor;
 
     @Column(name = "cliente_id")
     private String clienteId;
@@ -62,8 +65,10 @@ public class VehiculoEntity {
     public void setAnio(Integer anio) { this.anio = anio; }
     public String getColor() { return color; }
     public void setColor(String color) { this.color = color; }
-    public String getNumeroVin() { return numeroVin; }
-    public void setNumeroVin(String numeroVin) { this.numeroVin = numeroVin; }
+    public String getNumeroChasis() { return numeroChasis; }
+    public void setNumeroChasis(String numeroChasis) { this.numeroChasis = numeroChasis; }
+    public String getNumeroMotor() { return numeroMotor; }
+    public void setNumeroMotor(String numeroMotor) { this.numeroMotor = numeroMotor; }
     public String getClienteId() { return clienteId; }
     public void setClienteId(String clienteId) { this.clienteId = clienteId; }
     public boolean isActivo() { return activo; }

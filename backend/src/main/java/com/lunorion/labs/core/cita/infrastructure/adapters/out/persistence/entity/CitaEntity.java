@@ -42,7 +42,7 @@ public class CitaEntity {
     @Column(name = "notificar_whatsapp")
     private Boolean notificarWhatsapp = false;
 
-    @Column(name = "usuario_creo_id")
+    @Column(name = "usuario_creo")
     private String usuarioCreoId;
 
     @Column(name = "created_at", updatable = false)

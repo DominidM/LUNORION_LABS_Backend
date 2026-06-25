@@ -47,10 +47,10 @@ public class CierreCajaEntity {
     @Column(columnDefinition = "TEXT")
     private String observacion;
 
-    @Column(name = "usuario_apertura_id")
+    @Column(name = "usuario_apertura")
     private String usuarioAperturaId;
 
-    @Column(name = "usuario_cierre_id")
+    @Column(name = "usuario_cierre")
     private String usuarioCierreId;
 
     @Column(name = "created_at", updatable = false)

@@ -31,6 +31,9 @@ public class ClienteEntityMapper {
         Cliente domain = new Cliente(entity.getId(), entity.getTenantId().toString(),
                 entity.getTipoDocumento(), entity.getNumeroDocumento(),
                 entity.getNombres(), entity.getApellidos(), entity.getRazonSocial());
+        domain.setDireccion(entity.getDireccion());
+        domain.setTelefono(entity.getTelefono());
+        domain.setEmail(entity.getEmail());
         domain.setCreatedAt(entity.getCreatedAt());
         domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;

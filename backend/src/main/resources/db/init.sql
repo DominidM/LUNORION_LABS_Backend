@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS vehiculo (
     numero_motor VARCHAR(30),
     marca VARCHAR(50),
     modelo VARCHAR(50),
-    anio INTEGER,
+    año INTEGER,
     color VARCHAR(30),
     kilometraje INTEGER,
     tipo_combustible VARCHAR(20),

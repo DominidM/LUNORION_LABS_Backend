@@ -53,10 +53,10 @@ public class OrdenTrabajoEntity {
     @Column(name = "ot_origen_id")
     private UUID otOrigenId;
 
-    @Column(name = "usuario_creo_id")
+    @Column(name = "usuario_creo")
     private UUID usuarioCreoId;
 
-    @Column(name = "usuario_cerro_id")
+    @Column(name = "usuario_cerro")
     private UUID usuarioCerroId;
 
     @Column(name = "created_at", updatable = false)

@@ -10,13 +10,14 @@ public class Vehiculo extends BaseEntity {
     private String modelo;
     private Integer anio;
     private String color;
-    private String numeroVin;
+    private String numeroChasis;
+    private String numeroMotor;
     private String clienteId;
     private boolean activo;
 
     public Vehiculo() {}
 
-    public Vehiculo(UUID id, String tenantId, String placa, String marca, String modelo, Integer anio, String color, String numeroVin, String clienteId, boolean activo) {
+    public Vehiculo(UUID id, String tenantId, String placa, String marca, String modelo, Integer anio, String color, String numeroChasis, String numeroMotor, String clienteId, boolean activo) {
         super(id);
         this.tenantId = tenantId;
         this.placa = placa;
@@ -24,13 +25,14 @@ public class Vehiculo extends BaseEntity {
         this.modelo = modelo;
         this.anio = anio;
         this.color = color;
-        this.numeroVin = numeroVin;
+        this.numeroChasis = numeroChasis;
+        this.numeroMotor = numeroMotor;
         this.clienteId = clienteId;
         this.activo = activo;
     }
 
-    public static Vehiculo create(String tenantId, String placa, String marca, String modelo, Integer anio, String color, String numeroVin, String clienteId) {
-        return new Vehiculo(UUID.randomUUID(), tenantId, placa, marca, modelo, anio, color, numeroVin, clienteId, true);
+    public static Vehiculo create(String tenantId, String placa, String marca, String modelo, Integer anio, String color, String numeroChasis, String numeroMotor, String clienteId) {
+        return new Vehiculo(UUID.randomUUID(), tenantId, placa, marca, modelo, anio, color, numeroChasis, numeroMotor, clienteId, true);
     }
 
     public String getTenantId() { return tenantId; }
@@ -39,17 +41,19 @@ public class Vehiculo extends BaseEntity {
     public String getModelo() { return modelo; }
     public Integer getAnio() { return anio; }
     public String getColor() { return color; }
-    public String getNumeroVin() { return numeroVin; }
+    public String getNumeroChasis() { return numeroChasis; }
+    public String getNumeroMotor() { return numeroMotor; }
     public String getClienteId() { return clienteId; }
     public boolean isActivo() { return activo; }
 
-    public void actualizar(String placa, String marca, String modelo, Integer anio, String color, String numeroVin, String clienteId) {
+    public void actualizar(String placa, String marca, String modelo, Integer anio, String color, String numeroChasis, String numeroMotor, String clienteId) {
         this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
         this.color = color;
-        this.numeroVin = numeroVin;
+        this.numeroChasis = numeroChasis;
+        this.numeroMotor = numeroMotor;
         this.clienteId = clienteId;
         markUpdated();
     }

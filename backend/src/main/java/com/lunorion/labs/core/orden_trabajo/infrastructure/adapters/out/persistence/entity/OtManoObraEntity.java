@@ -13,7 +13,7 @@ public class OtManoObraEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "orden_trabajo_id", nullable = false)
+    @Column(name = "ot_id", nullable = false)
     private UUID ordenTrabajoId;
 
     @Column(name = "tecnico_id")
