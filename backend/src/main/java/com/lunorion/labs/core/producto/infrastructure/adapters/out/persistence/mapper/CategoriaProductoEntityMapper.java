@@ -24,7 +24,6 @@ public class CategoriaProductoEntityMapper {
         CategoriaProducto domain = new CategoriaProducto(entity.getId(),
                 entity.getTenantId().toString(), entity.getNombre());
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 }

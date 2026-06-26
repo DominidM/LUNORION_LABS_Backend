@@ -30,7 +30,6 @@ public class TecnicoEntityMapper {
                 entity.getUsuarioId() != null ? entity.getUsuarioId().toString() : null,
                 entity.getEspecialidades(), entity.getTarifaHora(), entity.getNumeroContacto());
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 

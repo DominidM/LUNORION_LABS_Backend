@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -30,7 +31,7 @@ public class VehiculoRepositoryAdapter implements IVehiculoRepositoryPort {
 
     @Override
     public Optional<Vehiculo> findById(String id) {
-        return jpaRepository.findById(id).map(entityMapper::toDomain);
+        return jpaRepository.findById(UUID.fromString(id)).map(entityMapper::toDomain);
     }
 
     @Override
@@ -40,14 +41,14 @@ public class VehiculoRepositoryAdapter implements IVehiculoRepositoryPort {
 
     @Override
     public List<Vehiculo> findByTenantId(String tenantId) {
-        return jpaRepository.findByTenantId(tenantId).stream()
+        return jpaRepository.findByTenantId(UUID.fromString(tenantId)).stream()
                 .map(entityMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Vehiculo> findByClienteId(String clienteId) {
-        return jpaRepository.findByClienteId(clienteId).stream()
+        return jpaRepository.findByClienteId(UUID.fromString(clienteId)).stream()
                 .map(entityMapper::toDomain)
                 .collect(Collectors.toList());
     }

@@ -30,7 +30,6 @@ public class ProveedorEntityMapper {
         Proveedor domain = new Proveedor(entity.getId(), entity.getTenantId().toString(),
                 entity.getRuc(), entity.getRazonSocial());
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 }

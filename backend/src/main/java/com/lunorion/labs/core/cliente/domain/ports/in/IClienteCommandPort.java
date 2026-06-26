@@ -7,4 +7,5 @@ public interface IClienteCommandPort {
     ClienteResponse create(CreateClienteRequest request);
     ClienteResponse update(String id, CreateClienteRequest request);
     void desactivar(String id);
+    void activar(String id);
 }

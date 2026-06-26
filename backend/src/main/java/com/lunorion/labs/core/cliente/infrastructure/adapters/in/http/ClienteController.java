@@ -75,6 +75,13 @@ public class ClienteController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/activar")
+    @Operation(summary = "Activar cliente", description = "Reactiva un cliente previamente desactivado")
+    public ResponseEntity<Void> activar(@PathVariable String id) {
+        commandService.activar(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}/historial-trabajos")
     @Operation(summary = "Historial de trabajos", description = "Retorna el historial de órdenes de trabajo de un cliente")
     public ResponseEntity<List<HistorialTrabajoResponse>> workHistory(@PathVariable String id) {

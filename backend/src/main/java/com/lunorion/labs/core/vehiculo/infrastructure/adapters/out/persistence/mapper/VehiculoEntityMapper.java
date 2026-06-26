@@ -11,8 +11,8 @@ public class VehiculoEntityMapper {
 
     public VehiculoEntity toEntity(Vehiculo domain) {
         VehiculoEntity entity = new VehiculoEntity();
-        entity.setId(domain.getId().toString());
-        entity.setTenantId(domain.getTenantId());
+        entity.setId(domain.getId());
+        entity.setTenantId(UUID.fromString(domain.getTenantId()));
         entity.setPlaca(domain.getPlaca());
         entity.setMarca(domain.getMarca());
         entity.setModelo(domain.getModelo());
@@ -20,7 +20,7 @@ public class VehiculoEntityMapper {
         entity.setColor(domain.getColor());
         entity.setNumeroChasis(domain.getNumeroChasis());
         entity.setNumeroMotor(domain.getNumeroMotor());
-        entity.setClienteId(domain.getClienteId());
+        entity.setClienteId(domain.getClienteId() != null ? UUID.fromString(domain.getClienteId()) : null);
         entity.setActivo(domain.isActivo());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
@@ -29,8 +29,8 @@ public class VehiculoEntityMapper {
 
     public Vehiculo toDomain(VehiculoEntity entity) {
         Vehiculo vehiculo = new Vehiculo(
-                UUID.fromString(entity.getId()),
-                entity.getTenantId(),
+                entity.getId(),
+                entity.getTenantId().toString(),
                 entity.getPlaca(),
                 entity.getMarca(),
                 entity.getModelo(),
@@ -38,7 +38,7 @@ public class VehiculoEntityMapper {
                 entity.getColor(),
                 entity.getNumeroChasis(),
                 entity.getNumeroMotor(),
-                entity.getClienteId(),
+                entity.getClienteId() != null ? entity.getClienteId().toString() : null,
                 entity.isActivo()
         );
         vehiculo.setCreatedAt(entity.getCreatedAt());

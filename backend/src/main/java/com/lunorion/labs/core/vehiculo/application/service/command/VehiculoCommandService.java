@@ -47,6 +47,14 @@ public class VehiculoCommandService implements IVehiculoCommandPort {
     }
 
     @Override
+    public void activar(String id) {
+        repository.findById(id).ifPresent(vehiculo -> {
+            vehiculo.activar();
+            repository.save(vehiculo);
+        });
+    }
+
+    @Override
     public void desactivar(String id) {
         repository.findById(id).ifPresent(vehiculo -> {
             vehiculo.desactivar();

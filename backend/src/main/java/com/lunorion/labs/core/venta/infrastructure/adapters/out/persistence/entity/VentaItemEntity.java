@@ -2,7 +2,6 @@ package com.lunorion.labs.core.venta.infrastructure.adapters.out.persistence.ent
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -31,16 +30,6 @@ public class VentaItemEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    public VentaItemEntity() {}
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public UUID getVentaId() { return ventaId; }
@@ -55,6 +44,4 @@ public class VentaItemEntity {
     public void setDescuento(BigDecimal descuento) { this.descuento = descuento; }
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
