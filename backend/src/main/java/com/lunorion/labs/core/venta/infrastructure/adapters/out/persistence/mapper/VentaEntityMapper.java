@@ -37,7 +37,6 @@ public class VentaEntityMapper {
                 entity.getTotal(),
                 entity.getUsuarioId() != null ? entity.getUsuarioId().toString() : null);
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 

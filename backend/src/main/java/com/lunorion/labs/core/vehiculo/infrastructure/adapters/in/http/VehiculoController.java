@@ -71,6 +71,13 @@ public class VehiculoController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/activar")
+    @Operation(summary = "Activar vehículo", description = "Activa un vehículo previamente desactivado")
+    public ResponseEntity<Void> activar(@PathVariable String id) {
+        commandService.activar(id);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{id}/desactivar")
     @Operation(summary = "Desactivar vehículo", description = "Desactiva un vehículo (soft delete)")
     public ResponseEntity<Void> desactivar(@PathVariable String id) {

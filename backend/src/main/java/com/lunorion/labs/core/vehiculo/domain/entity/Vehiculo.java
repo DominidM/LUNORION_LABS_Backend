@@ -60,4 +60,5 @@ public class Vehiculo extends BaseEntity {
 
     public void asignarCliente(String clienteId) { this.clienteId = clienteId; markUpdated(); }
     public void desactivar() { this.activo = false; markUpdated(); }
+    public void activar() { this.activo = true; markUpdated(); }
 }

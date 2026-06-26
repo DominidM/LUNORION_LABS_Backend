@@ -9,15 +9,19 @@ import java.util.UUID;
 public class VehiculoEntity {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "tenant_id")
-    private String tenantId;
+    private UUID tenantId;
 
     private String placa;
     private String marca;
     private String modelo;
+
+    @Column(name = "año")
     private Integer anio;
+
     private String color;
 
     @Column(name = "numero_chasis")
@@ -27,7 +31,7 @@ public class VehiculoEntity {
     private String numeroMotor;
 
     @Column(name = "cliente_id")
-    private String clienteId;
+    private UUID clienteId;
 
     private boolean activo;
 
@@ -39,9 +43,6 @@ public class VehiculoEntity {
 
     @PrePersist
     public void prePersist() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -51,10 +52,10 @@ public class VehiculoEntity {
         updatedAt = LocalDateTime.now();
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getTenantId() { return tenantId; }
-    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public UUID getTenantId() { return tenantId; }
+    public void setTenantId(UUID tenantId) { this.tenantId = tenantId; }
     public String getPlaca() { return placa; }
     public void setPlaca(String placa) { this.placa = placa; }
     public String getMarca() { return marca; }
@@ -69,8 +70,8 @@ public class VehiculoEntity {
     public void setNumeroChasis(String numeroChasis) { this.numeroChasis = numeroChasis; }
     public String getNumeroMotor() { return numeroMotor; }
     public void setNumeroMotor(String numeroMotor) { this.numeroMotor = numeroMotor; }
-    public String getClienteId() { return clienteId; }
-    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
+    public UUID getClienteId() { return clienteId; }
+    public void setClienteId(UUID clienteId) { this.clienteId = clienteId; }
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
     public LocalDateTime getCreatedAt() { return createdAt; }

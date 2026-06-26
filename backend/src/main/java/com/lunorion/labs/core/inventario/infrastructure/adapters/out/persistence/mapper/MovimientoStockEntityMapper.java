@@ -40,7 +40,6 @@ public class MovimientoStockEntityMapper {
                 entity.getObservacion(),
                 entity.getUsuarioId() != null ? entity.getUsuarioId().toString() : null);
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 }

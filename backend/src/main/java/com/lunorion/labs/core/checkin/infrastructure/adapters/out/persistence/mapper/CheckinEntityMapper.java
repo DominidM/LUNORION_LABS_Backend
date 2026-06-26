@@ -41,7 +41,6 @@ public class CheckinEntityMapper {
         if (entity.getOtId() != null) domain.asignarOt(entity.getOtId().toString());
         if (entity.getPdfActa() != null) domain.adjuntarActa(entity.getPdfActa());
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;
     }
 

@@ -53,7 +53,6 @@ public class CotizacionEntityMapper {
         domain.setTotal(entity.getTotal());
         domain.setActivo(entity.getActivo());
         domain.setCreatedAt(entity.getCreatedAt());
-        domain.setUpdatedAt(entity.getUpdatedAt());
         if (entity.getItems() != null) {
             domain.setItems(entity.getItems().stream()
                     .map(this::toItemDomain)

@@ -51,9 +51,6 @@ public class CotizacionEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     @OneToMany(mappedBy = "cotizacion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<CotizacionItemEntity> items;
 
@@ -62,12 +59,6 @@ public class CotizacionEntity {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 
     public UUID getId() { return id; }
@@ -96,8 +87,6 @@ public class CotizacionEntity {
     public void setActivo(Boolean activo) { this.activo = activo; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public List<CotizacionItemEntity> getItems() { return items; }
     public void setItems(List<CotizacionItemEntity> items) { this.items = items; }
 }
