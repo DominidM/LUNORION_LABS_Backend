@@ -20,13 +20,13 @@ public class CierreCaja extends BaseEntity {
     private BigDecimal saldoReal;
     private BigDecimal descuadre;
     private String observacion;
-    private String usuarioAperturaId;
-    private String usuarioCierreId;
+    private UUID usuarioAperturaId;
+    private UUID usuarioCierreId;
 
     public CierreCaja() {}
 
     public CierreCaja(UUID id, String tenantId, LocalDate fecha, LocalTime horaApertura,
-                      BigDecimal saldoInicial, String usuarioAperturaId) {
+                      BigDecimal saldoInicial, UUID usuarioAperturaId) {
         super(id);
         this.tenantId = tenantId;
         this.fecha = fecha;
@@ -38,11 +38,11 @@ public class CierreCaja extends BaseEntity {
     }
 
     public static CierreCaja create(String tenantId, LocalDate fecha, LocalTime horaApertura,
-                                    BigDecimal saldoInicial, String usuarioAperturaId) {
+                                    BigDecimal saldoInicial, UUID usuarioAperturaId) {
         return new CierreCaja(UUID.randomUUID(), tenantId, fecha, horaApertura, saldoInicial, usuarioAperturaId);
     }
 
-    public void cerrar(LocalTime horaCierre, BigDecimal saldoReal, String observacion, String usuarioCierreId) {
+    public void cerrar(LocalTime horaCierre, BigDecimal saldoReal, String observacion, UUID usuarioCierreId) {
         this.horaCierre = horaCierre;
         this.saldoReal = saldoReal;
         this.observacion = observacion;
@@ -65,6 +65,6 @@ public class CierreCaja extends BaseEntity {
     public BigDecimal getSaldoReal() { return saldoReal; }
     public BigDecimal getDescuadre() { return descuadre; }
     public String getObservacion() { return observacion; }
-    public String getUsuarioAperturaId() { return usuarioAperturaId; }
-    public String getUsuarioCierreId() { return usuarioCierreId; }
+    public UUID getUsuarioAperturaId() { return usuarioAperturaId; }
+    public UUID getUsuarioCierreId() { return usuarioCierreId; }
 }

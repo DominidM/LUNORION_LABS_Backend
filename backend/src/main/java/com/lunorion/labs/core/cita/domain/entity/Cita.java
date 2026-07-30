@@ -8,21 +8,21 @@ import java.util.UUID;
 public class Cita extends BaseEntity {
 
     private String tenantId;
-    private String clienteId;
-    private String vehiculoId;
-    private String tecnicoId;
+    private UUID clienteId;
+    private UUID vehiculoId;
+    private UUID tecnicoId;
     private String servicioDescripcion;
     private LocalDateTime fechaHora;
     private int duracionMinutos;
     private String estado;
     private boolean recordatorioEnviado;
     private boolean notificarWhatsapp;
-    private String usuarioCreoId;
+    private UUID usuarioCreoId;
 
     public Cita() {}
 
-    public Cita(UUID id, String tenantId, String clienteId, String vehiculoId,
-                LocalDateTime fechaHora, int duracionMinutos, String usuarioCreoId) {
+    public Cita(UUID id, String tenantId, UUID clienteId, UUID vehiculoId,
+                LocalDateTime fechaHora, int duracionMinutos, UUID usuarioCreoId) {
         super(id);
         this.tenantId = tenantId;
         this.clienteId = clienteId;
@@ -34,9 +34,9 @@ public class Cita extends BaseEntity {
         this.recordatorioEnviado = false;
     }
 
-    public static Cita create(String tenantId, String clienteId, String vehiculoId, String tecnicoId,
+    public static Cita create(String tenantId, UUID clienteId, UUID vehiculoId, UUID tecnicoId,
                               String servicioDescripcion, LocalDateTime fechaHora, int duracionMinutos,
-                              boolean notificarWhatsapp, String usuarioCreoId) {
+                              boolean notificarWhatsapp, UUID usuarioCreoId) {
         Cita cita = new Cita(UUID.randomUUID(), tenantId, clienteId, vehiculoId,
                 fechaHora, duracionMinutos, usuarioCreoId);
         cita.tecnicoId = tecnicoId;
@@ -76,19 +76,19 @@ public class Cita extends BaseEntity {
         markUpdated();
     }
 
-    public void setTecnicoId(String tecnicoId) { this.tecnicoId = tecnicoId; }
+    public void setTecnicoId(UUID tecnicoId) { this.tecnicoId = tecnicoId; }
     public void setServicioDescripcion(String servicioDescripcion) { this.servicioDescripcion = servicioDescripcion; }
     public void setNotificarWhatsapp(boolean notificarWhatsapp) { this.notificarWhatsapp = notificarWhatsapp; }
 
     public String getTenantId() { return tenantId; }
-    public String getClienteId() { return clienteId; }
-    public String getVehiculoId() { return vehiculoId; }
-    public String getTecnicoId() { return tecnicoId; }
+    public UUID getClienteId() { return clienteId; }
+    public UUID getVehiculoId() { return vehiculoId; }
+    public UUID getTecnicoId() { return tecnicoId; }
     public String getServicioDescripcion() { return servicioDescripcion; }
     public LocalDateTime getFechaHora() { return fechaHora; }
     public int getDuracionMinutos() { return duracionMinutos; }
     public String getEstado() { return estado; }
     public boolean isRecordatorioEnviado() { return recordatorioEnviado; }
     public boolean isNotificarWhatsapp() { return notificarWhatsapp; }
-    public String getUsuarioCreoId() { return usuarioCreoId; }
+    public UUID getUsuarioCreoId() { return usuarioCreoId; }
 }

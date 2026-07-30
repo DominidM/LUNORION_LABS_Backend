@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -34,7 +35,7 @@ public class CitaCommandService implements ICitaCommandPort {
     }
 
     @Override
-    public CitaResponse reprogramar(String id, ReprogramarCitaRequest request) {
+    public CitaResponse reprogramar(UUID id, ReprogramarCitaRequest request) {
         Cita cita = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita not found with id: " + id));
         cita.reprogramar(LocalDateTime.parse(request.getFechaHora()));
@@ -43,7 +44,7 @@ public class CitaCommandService implements ICitaCommandPort {
     }
 
     @Override
-    public void confirmar(String id) {
+    public void confirmar(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.confirmar();
             repository.save(c);
@@ -51,7 +52,7 @@ public class CitaCommandService implements ICitaCommandPort {
     }
 
     @Override
-    public void cancelar(String id) {
+    public void cancelar(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.cancelar();
             repository.save(c);
@@ -59,7 +60,7 @@ public class CitaCommandService implements ICitaCommandPort {
     }
 
     @Override
-    public void cambiarEstado(String id, String estado) {
+    public void cambiarEstado(UUID id, String estado) {
         repository.findById(id).ifPresent(c -> {
             c.cambiarEstado(estado);
             repository.save(c);

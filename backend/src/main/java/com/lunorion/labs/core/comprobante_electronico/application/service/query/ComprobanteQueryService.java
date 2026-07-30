@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +36,7 @@ public class ComprobanteQueryService implements IComprobanteQueryPort {
     }
 
     @Override
-    public Optional<ComprobanteResponse> findById(String id) {
+    public Optional<ComprobanteResponse> findById(UUID id) {
         return repository.findById(id).map(mapper::toResponse);
     }
 
@@ -46,14 +48,14 @@ public class ComprobanteQueryService implements IComprobanteQueryPort {
     }
 
     @Override
-    public List<ComprobanteResponse> findByVentaId(String ventaId) {
+    public List<ComprobanteResponse> findByVentaId(UUID ventaId) {
         return repository.findByVentaId(ventaId).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CdrResponse descargarCdr(String id) {
+    public CdrResponse descargarCdr(UUID id) {
         return repository.findById(id)
                 .map(c -> {
                     CdrResponse r = new CdrResponse();
@@ -66,14 +68,14 @@ public class ComprobanteQueryService implements IComprobanteQueryPort {
     }
 
     @Override
-    public String descargarXml(String id) {
+    public String descargarXml(UUID id) {
         return repository.findById(id)
                 .map(c -> c.getXmlFirmado() != null ? c.getXmlFirmado() : "<sin-firma/>")
                 .orElseThrow(() -> new RuntimeException("XML no encontrado para comprobante: " + id));
     }
 
     @Override
-    public ReporteFacturacionResponse reporteFacturacion(String tenantId, String fechaInicio, String fechaFin) {
+    public ReporteFacturacionResponse reporteFacturacion(String tenantId, LocalDate fechaInicio, LocalDate fechaFin) {
         List<ComprobanteResponse> comprobantes = repository
                 .findByTenantIdAndFechaEmisionBetween(tenantId, fechaInicio, fechaFin).stream()
                 .map(mapper::toResponse)
@@ -91,7 +93,7 @@ public class ComprobanteQueryService implements IComprobanteQueryPort {
     }
 
     @Override
-    public Optional<ResumenDiarioResponse> estadoResumenDiario(String id) {
+    public Optional<ResumenDiarioResponse> estadoResumenDiario(UUID id) {
         return repository.findResumenDiarioById(id).map(resumenDiarioMapper::toResponse);
     }
 
@@ -106,9 +108,9 @@ public class ComprobanteQueryService implements IComprobanteQueryPort {
     }
 
     @Override
-    public PleResponse descargarPle(String id) {
+    public PleResponse descargarPle(UUID id) {
         PleResponse r = new PleResponse();
-        r.setId(id);
+        r.setId(id.toString());
         r.setEstado("DISPONIBLE");
         r.setArchivoUrl("/ple/descargas/" + id + ".xml");
         return r;

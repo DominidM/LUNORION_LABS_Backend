@@ -30,8 +30,8 @@ public class CitaRepositoryAdapter implements ICitaRepositoryPort {
     }
 
     @Override
-    public Optional<Cita> findById(String id) {
-        return jpaRepository.findById(UUID.fromString(id)).map(mapper::toDomain);
+    public Optional<Cita> findById(UUID id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
@@ -41,20 +41,20 @@ public class CitaRepositoryAdapter implements ICitaRepositoryPort {
     }
 
     @Override
-    public List<Cita> findByClienteId(String clienteId) {
+    public List<Cita> findByClienteId(UUID clienteId) {
         return jpaRepository.findByClienteId(clienteId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<Cita> findByTecnicoId(String tecnicoId) {
+    public List<Cita> findByTecnicoId(UUID tecnicoId) {
         return jpaRepository.findByTecnicoId(tecnicoId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class CitaRepositoryAdapter implements ICitaRepositoryPort {
     }
 
     @Override
-    public List<Cita> findByTecnicoIdAndFechaHoraBetween(String tecnicoId, LocalDate desde, LocalDate hasta) {
+    public List<Cita> findByTecnicoIdAndFechaHoraBetween(UUID tecnicoId, LocalDate desde, LocalDate hasta) {
         return jpaRepository.findByTecnicoIdAndFechaHoraBetween(
                 tecnicoId, desde.atStartOfDay(), hasta.atTime(LocalTime.MAX)).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());

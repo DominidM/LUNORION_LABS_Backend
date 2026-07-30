@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Component
 public class CajaMapper {
@@ -21,7 +22,7 @@ public class CajaMapper {
             LocalDate.parse(request.getFecha()),
             LocalTime.parse(request.getHoraApertura()),
             request.getSaldoInicial(),
-            request.getUsuarioAperturaId()
+            UUID.fromString(request.getUsuarioAperturaId())
         );
     }
 
@@ -39,8 +40,8 @@ public class CajaMapper {
         response.setSaldoReal(domain.getSaldoReal());
         response.setDescuadre(domain.getDescuadre());
         response.setObservacion(domain.getObservacion());
-        response.setUsuarioAperturaId(domain.getUsuarioAperturaId());
-        response.setUsuarioCierreId(domain.getUsuarioCierreId());
+        response.setUsuarioAperturaId(domain.getUsuarioAperturaId().toString());
+        response.setUsuarioCierreId(domain.getUsuarioCierreId() != null ? domain.getUsuarioCierreId().toString() : null);
         return response;
     }
 
@@ -52,7 +53,7 @@ public class CajaMapper {
             request.getMetodoPago(),
             request.getMonto(),
             request.getConcepto(),
-            request.getUsuarioId()
+            UUID.fromString(request.getUsuarioId())
         );
         domain.setReferencia(request.getReferencia());
         return domain;
@@ -67,7 +68,7 @@ public class CajaMapper {
         response.setMonto(domain.getMonto());
         response.setReferencia(domain.getReferencia());
         response.setConcepto(domain.getConcepto());
-        response.setUsuarioId(domain.getUsuarioId());
+        response.setUsuarioId(domain.getUsuarioId().toString());
         return response;
     }
 }

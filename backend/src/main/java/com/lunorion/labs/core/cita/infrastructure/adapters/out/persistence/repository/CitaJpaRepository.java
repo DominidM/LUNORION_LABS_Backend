@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface CitaJpaRepository extends JpaRepository<CitaEntity, UUID> {
     List<CitaEntity> findByTenantId(UUID tenantId);
-    List<CitaEntity> findByClienteId(String clienteId);
-    List<CitaEntity> findByTecnicoId(String tecnicoId);
+    List<CitaEntity> findByClienteId(UUID clienteId);
+    List<CitaEntity> findByTecnicoId(UUID tecnicoId);
     List<CitaEntity> findByFechaHoraBetween(LocalDateTime desde, LocalDateTime hasta);
     List<CitaEntity> findByTenantIdAndFechaHoraBetween(UUID tenantId, LocalDateTime desde, LocalDateTime hasta);
-    List<CitaEntity> findByTecnicoIdAndFechaHoraBetween(String tecnicoId, LocalDateTime desde, LocalDateTime hasta);
+    List<CitaEntity> findByTecnicoIdAndFechaHoraBetween(UUID tecnicoId, LocalDateTime desde, LocalDateTime hasta);
 }

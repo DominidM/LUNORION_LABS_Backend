@@ -6,11 +6,13 @@ import com.lunorion.labs.core.cita.application.dto.in.ReprogramarCitaRequest;
 import com.lunorion.labs.core.cita.application.dto.out.CitaResponse;
 import com.lunorion.labs.core.cita.application.dto.out.NotificacionesConfigResponse;
 
+import java.util.UUID;
+
 public interface ICitaCommandPort {
     CitaResponse crear(CreateCitaRequest request);
-    CitaResponse reprogramar(String id, ReprogramarCitaRequest request);
-    void confirmar(String id);
-    void cancelar(String id);
-    void cambiarEstado(String id, String estado);
+    CitaResponse reprogramar(UUID id, ReprogramarCitaRequest request);
+    void confirmar(UUID id);
+    void cancelar(UUID id);
+    void cambiarEstado(UUID id, String estado);
     NotificacionesConfigResponse updateNotificacionesConfig(NotificacionesConfigRequest request);
 }

@@ -33,8 +33,8 @@ public class ComprobanteRepositoryAdapter implements IComprobanteRepositoryPort 
     }
 
     @Override
-    public Optional<ComprobanteElectronico> findById(String id) {
-        return jpaRepository.findById(UUID.fromString(id)).map(mapper::toDomain);
+    public Optional<ComprobanteElectronico> findById(UUID id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
@@ -44,17 +44,17 @@ public class ComprobanteRepositoryAdapter implements IComprobanteRepositoryPort 
     }
 
     @Override
-    public List<ComprobanteElectronico> findByVentaId(String ventaId) {
+    public List<ComprobanteElectronico> findByVentaId(UUID ventaId) {
         return jpaRepository.findByVentaId(ventaId).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public List<ComprobanteElectronico> findByTenantIdAndFechaEmisionBetween(String tenantId, String fechaInicio, String fechaFin) {
+    public List<ComprobanteElectronico> findByTenantIdAndFechaEmisionBetween(String tenantId, LocalDate fechaInicio, LocalDate fechaFin) {
         return jpaRepository.findByTenantIdAndFechaEmisionBetween(
                 UUID.fromString(tenantId),
-                LocalDate.parse(fechaInicio),
-                LocalDate.parse(fechaFin)).stream()
+                fechaInicio,
+                fechaFin).stream()
                 .map(mapper::toDomain).collect(Collectors.toList());
     }
 
@@ -64,8 +64,8 @@ public class ComprobanteRepositoryAdapter implements IComprobanteRepositoryPort 
     }
 
     @Override
-    public Optional<ResumenDiario> findResumenDiarioById(String id) {
-        return resumenDiarioJpaRepository.findById(UUID.fromString(id)).map(mapper::toResumenDiarioDomain);
+    public Optional<ResumenDiario> findResumenDiarioById(UUID id) {
+        return resumenDiarioJpaRepository.findById(id).map(mapper::toResumenDiarioDomain);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class ComprobanteElectronicoEntity {
     private UUID tenantId;
 
     @Column(name = "venta_id")
-    private String ventaId;
+    private UUID ventaId;
 
     @Column(nullable = false, length = 2)
     private String tipo;
@@ -55,7 +55,7 @@ public class ComprobanteElectronicoEntity {
     private String descripcionError;
 
     @Column(name = "comprobante_referencia_id")
-    private String comprobanteReferenciaId;
+    private UUID comprobanteReferenciaId;
 
     @Column(name = "monto_operaciones_gravadas", precision = 12, scale = 2)
     private BigDecimal montoOperacionesGravadas;
@@ -76,10 +76,10 @@ public class ComprobanteElectronicoEntity {
     private int intentosEnvio;
 
     @Column(name = "ultimo_envio")
-    private LocalTime ultimoEnvio;
+    private LocalDateTime ultimoEnvio;
 
-    @Column(name = "enviado_por_id")
-    private String enviadoPorId;
+    @Column(name = "enviado_por")
+    private UUID enviadoPorId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -93,8 +93,8 @@ public class ComprobanteElectronicoEntity {
     public void setId(UUID id) { this.id = id; }
     public UUID getTenantId() { return tenantId; }
     public void setTenantId(UUID tenantId) { this.tenantId = tenantId; }
-    public String getVentaId() { return ventaId; }
-    public void setVentaId(String ventaId) { this.ventaId = ventaId; }
+    public UUID getVentaId() { return ventaId; }
+    public void setVentaId(UUID ventaId) { this.ventaId = ventaId; }
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
     public String getSerie() { return serie; }
@@ -117,8 +117,8 @@ public class ComprobanteElectronicoEntity {
     public void setCodigoErrorSunat(String codigoErrorSunat) { this.codigoErrorSunat = codigoErrorSunat; }
     public String getDescripcionError() { return descripcionError; }
     public void setDescripcionError(String descripcionError) { this.descripcionError = descripcionError; }
-    public String getComprobanteReferenciaId() { return comprobanteReferenciaId; }
-    public void setComprobanteReferenciaId(String comprobanteReferenciaId) { this.comprobanteReferenciaId = comprobanteReferenciaId; }
+    public UUID getComprobanteReferenciaId() { return comprobanteReferenciaId; }
+    public void setComprobanteReferenciaId(UUID comprobanteReferenciaId) { this.comprobanteReferenciaId = comprobanteReferenciaId; }
     public BigDecimal getMontoOperacionesGravadas() { return montoOperacionesGravadas; }
     public void setMontoOperacionesGravadas(BigDecimal montoOperacionesGravadas) { this.montoOperacionesGravadas = montoOperacionesGravadas; }
     public BigDecimal getMontoIgv() { return montoIgv; }
@@ -131,10 +131,10 @@ public class ComprobanteElectronicoEntity {
     public void setRazonSocialCliente(String razonSocialCliente) { this.razonSocialCliente = razonSocialCliente; }
     public int getIntentosEnvio() { return intentosEnvio; }
     public void setIntentosEnvio(int intentosEnvio) { this.intentosEnvio = intentosEnvio; }
-    public LocalTime getUltimoEnvio() { return ultimoEnvio; }
-    public void setUltimoEnvio(LocalTime ultimoEnvio) { this.ultimoEnvio = ultimoEnvio; }
-    public String getEnviadoPorId() { return enviadoPorId; }
-    public void setEnviadoPorId(String enviadoPorId) { this.enviadoPorId = enviadoPorId; }
+    public LocalDateTime getUltimoEnvio() { return ultimoEnvio; }
+    public void setUltimoEnvio(LocalDateTime ultimoEnvio) { this.ultimoEnvio = ultimoEnvio; }
+    public UUID getEnviadoPorId() { return enviadoPorId; }
+    public void setEnviadoPorId(UUID enviadoPorId) { this.enviadoPorId = enviadoPorId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

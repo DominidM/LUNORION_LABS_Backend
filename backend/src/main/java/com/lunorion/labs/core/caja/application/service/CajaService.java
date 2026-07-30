@@ -59,7 +59,7 @@ public class CajaService {
                 LocalTime.parse(request.getHoraCierre()),
                 request.getSaldoReal(),
                 request.getObservacion(),
-                request.getUsuarioCierreId()
+                UUID.fromString(request.getUsuarioCierreId())
             );
             entity = cierreEntityMapper.toEntity(domain);
             entity = cierreRepo.save(entity);
