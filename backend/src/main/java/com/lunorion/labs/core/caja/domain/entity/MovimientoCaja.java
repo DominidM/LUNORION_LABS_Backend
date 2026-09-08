@@ -14,12 +14,12 @@ public class MovimientoCaja extends BaseEntity {
     private BigDecimal monto;
     private String referencia;
     private String concepto;
-    private String usuarioId;
+    private UUID usuarioId;
 
     public MovimientoCaja() {}
 
     public MovimientoCaja(UUID id, String tenantId, String cierreCajaId, String tipo,
-                          String metodoPago, BigDecimal monto, String concepto, String usuarioId) {
+                          String metodoPago, BigDecimal monto, String concepto, UUID usuarioId) {
         super(id);
         this.tenantId = tenantId;
         this.cierreCajaId = cierreCajaId;
@@ -31,7 +31,7 @@ public class MovimientoCaja extends BaseEntity {
     }
 
     public static MovimientoCaja create(String tenantId, String cierreCajaId, String tipo,
-                                        String metodoPago, BigDecimal monto, String concepto, String usuarioId) {
+                                        String metodoPago, BigDecimal monto, String concepto, UUID usuarioId) {
         return new MovimientoCaja(UUID.randomUUID(), tenantId, cierreCajaId, tipo,
                 metodoPago, monto, concepto, usuarioId);
     }
@@ -46,5 +46,5 @@ public class MovimientoCaja extends BaseEntity {
     public String getReferencia() { return referencia; }
     public void setReferencia(String referencia) { this.referencia = referencia; }
     public String getConcepto() { return concepto; }
-    public String getUsuarioId() { return usuarioId; }
+    public UUID getUsuarioId() { return usuarioId; }
 }

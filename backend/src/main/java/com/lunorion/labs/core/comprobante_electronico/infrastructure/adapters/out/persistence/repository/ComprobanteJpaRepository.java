@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface ComprobanteJpaRepository extends JpaRepository<ComprobanteElectronicoEntity, UUID> {
     List<ComprobanteElectronicoEntity> findByTenantId(UUID tenantId);
-    List<ComprobanteElectronicoEntity> findByVentaId(String ventaId);
+    List<ComprobanteElectronicoEntity> findByVentaId(UUID ventaId);
     List<ComprobanteElectronicoEntity> findByTenantIdAndFechaEmisionBetween(UUID tenantId, LocalDate fechaInicio, LocalDate fechaFin);
 }

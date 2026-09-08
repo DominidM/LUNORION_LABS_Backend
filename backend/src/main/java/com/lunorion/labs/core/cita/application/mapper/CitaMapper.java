@@ -6,6 +6,7 @@ import com.lunorion.labs.core.cita.domain.entity.Cita;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 public class CitaMapper {
@@ -13,14 +14,14 @@ public class CitaMapper {
     public Cita toDomain(CreateCitaRequest request) {
         return Cita.create(
             request.getTenantId(),
-            request.getClienteId(),
-            request.getVehiculoId(),
-            request.getTecnicoId(),
+            UUID.fromString(request.getClienteId()),
+            UUID.fromString(request.getVehiculoId()),
+            UUID.fromString(request.getTecnicoId()),
             request.getServicioDescripcion(),
             LocalDateTime.parse(request.getFechaHora()),
             request.getDuracionMinutos(),
             request.isNotificarWhatsapp(),
-            request.getUsuarioCreoId()
+            UUID.fromString(request.getUsuarioCreoId())
         );
     }
 
@@ -28,16 +29,16 @@ public class CitaMapper {
         CitaResponse response = new CitaResponse();
         response.setId(domain.getId().toString());
         response.setTenantId(domain.getTenantId());
-        response.setClienteId(domain.getClienteId());
-        response.setVehiculoId(domain.getVehiculoId());
-        response.setTecnicoId(domain.getTecnicoId());
+        response.setClienteId(domain.getClienteId().toString());
+        response.setVehiculoId(domain.getVehiculoId().toString());
+        response.setTecnicoId(domain.getTecnicoId().toString());
         response.setServicioDescripcion(domain.getServicioDescripcion());
         response.setFechaHora(domain.getFechaHora() != null ? domain.getFechaHora().toString() : null);
         response.setDuracionMinutos(domain.getDuracionMinutos());
         response.setEstado(domain.getEstado());
         response.setRecordatorioEnviado(domain.isRecordatorioEnviado());
         response.setNotificarWhatsapp(domain.isNotificarWhatsapp());
-        response.setUsuarioCreoId(domain.getUsuarioCreoId());
+        response.setUsuarioCreoId(domain.getUsuarioCreoId().toString());
         return response;
     }
 }

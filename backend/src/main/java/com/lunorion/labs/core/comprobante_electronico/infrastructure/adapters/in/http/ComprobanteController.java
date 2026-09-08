@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/comprobantes")
@@ -44,7 +46,7 @@ public class ComprobanteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ComprobanteResponse> findById(@PathVariable String id) {
-        return queryService.findById(id)
+        return queryService.findById(UUID.fromString(id))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -56,46 +58,46 @@ public class ComprobanteController {
 
     @GetMapping("/venta/{ventaId}")
     public ResponseEntity<List<ComprobanteResponse>> findByVenta(@PathVariable String ventaId) {
-        return ResponseEntity.ok(queryService.findByVentaId(ventaId));
+        return ResponseEntity.ok(queryService.findByVentaId(UUID.fromString(ventaId)));
     }
 
     @PostMapping("/{id}/firmar")
     public ResponseEntity<Void> firmar(@PathVariable String id) {
-        commandService.firmar(id);
+        commandService.firmar(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/enviar")
     public ResponseEntity<Void> enviarSunat(@PathVariable String id) {
-        commandService.enviarSunat(id);
+        commandService.enviarSunat(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/aceptar")
     public ResponseEntity<Void> aceptar(@PathVariable String id) {
-        commandService.aceptar(id);
+        commandService.aceptar(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/rechazar")
     public ResponseEntity<Void> rechazar(@PathVariable String id, @RequestParam String error) {
-        commandService.rechazar(id, error);
+        commandService.rechazar(UUID.fromString(id), error);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/cdr")
     public ResponseEntity<CdrResponse> descargarCdr(@PathVariable String id) {
-        return ResponseEntity.ok(queryService.descargarCdr(id));
+        return ResponseEntity.ok(queryService.descargarCdr(UUID.fromString(id)));
     }
 
     @GetMapping("/{id}/xml")
     public ResponseEntity<String> descargarXml(@PathVariable String id) {
-        return ResponseEntity.ok(queryService.descargarXml(id));
+        return ResponseEntity.ok(queryService.descargarXml(UUID.fromString(id)));
     }
 
     @PostMapping("/{id}/reenviar")
     public ResponseEntity<Void> reenviar(@PathVariable String id) {
-        commandService.reenviar(id);
+        commandService.reenviar(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
@@ -106,7 +108,7 @@ public class ComprobanteController {
 
     @GetMapping("/resumen-diario/{id}")
     public ResponseEntity<ResumenDiarioResponse> estadoResumenDiario(@PathVariable String id) {
-        return queryService.estadoResumenDiario(id)
+        return queryService.estadoResumenDiario(UUID.fromString(id))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -116,7 +118,7 @@ public class ComprobanteController {
             @RequestParam String tenantId,
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin) {
-        return ResponseEntity.ok(queryService.reporteFacturacion(tenantId, fechaInicio, fechaFin));
+        return ResponseEntity.ok(queryService.reporteFacturacion(tenantId, LocalDate.parse(fechaInicio), LocalDate.parse(fechaFin)));
     }
 
     @GetMapping("/ple")
@@ -126,6 +128,6 @@ public class ComprobanteController {
 
     @GetMapping("/ple/descargar")
     public ResponseEntity<PleResponse> descargarPle(@RequestParam String id) {
-        return ResponseEntity.ok(queryService.descargarPle(id));
+        return ResponseEntity.ok(queryService.descargarPle(UUID.fromString(id)));
     }
 }

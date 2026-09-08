@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +30,7 @@ public class CitaQueryService implements ICitaQueryPort {
     }
 
     @Override
-    public Optional<CitaResponse> findById(String id) {
+    public Optional<CitaResponse> findById(UUID id) {
         return repository.findById(id).map(mapper::toResponse);
     }
 
@@ -41,14 +42,14 @@ public class CitaQueryService implements ICitaQueryPort {
     }
 
     @Override
-    public List<CitaResponse> findByClienteId(String clienteId) {
+    public List<CitaResponse> findByClienteId(UUID clienteId) {
         return repository.findByClienteId(clienteId).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<CitaResponse> findByTecnicoId(String tecnicoId) {
+    public List<CitaResponse> findByTecnicoId(UUID tecnicoId) {
         return repository.findByTecnicoId(tecnicoId).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
@@ -63,7 +64,7 @@ public class CitaQueryService implements ICitaQueryPort {
     }
 
     @Override
-    public List<DisponibilidadResponse> disponibilidad(LocalDate fecha, String tecnicoId) {
+    public List<DisponibilidadResponse> disponibilidad(LocalDate fecha, UUID tecnicoId) {
         List<CitaResponse> citas = repository.findByTecnicoIdAndFechaHoraBetween(tecnicoId, fecha, fecha).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());

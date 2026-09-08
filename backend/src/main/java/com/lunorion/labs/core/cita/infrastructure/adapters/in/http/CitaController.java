@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/citas")
@@ -36,12 +37,12 @@ public class CitaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CitaResponse> reprogramar(@PathVariable String id, @RequestBody ReprogramarCitaRequest request) {
-        return ResponseEntity.ok(commandService.reprogramar(id, request));
+        return ResponseEntity.ok(commandService.reprogramar(UUID.fromString(id), request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CitaResponse> findById(@PathVariable String id) {
-        return queryService.findById(id)
+        return queryService.findById(UUID.fromString(id))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -53,29 +54,29 @@ public class CitaController {
 
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<CitaResponse>> findByCliente(@PathVariable String clienteId) {
-        return ResponseEntity.ok(queryService.findByClienteId(clienteId));
+        return ResponseEntity.ok(queryService.findByClienteId(UUID.fromString(clienteId)));
     }
 
     @GetMapping("/tecnico/{tecnicoId}")
     public ResponseEntity<List<CitaResponse>> findByTecnico(@PathVariable String tecnicoId) {
-        return ResponseEntity.ok(queryService.findByTecnicoId(tecnicoId));
+        return ResponseEntity.ok(queryService.findByTecnicoId(UUID.fromString(tecnicoId)));
     }
 
     @PostMapping("/{id}/confirmar")
     public ResponseEntity<Void> confirmar(@PathVariable String id) {
-        commandService.confirmar(id);
+        commandService.confirmar(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/cancelar")
     public ResponseEntity<Void> cancelar(@PathVariable String id) {
-        commandService.cancelar(id);
+        commandService.cancelar(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<Void> cambiarEstado(@PathVariable String id, @RequestBody CambiarEstadoRequest request) {
-        commandService.cambiarEstado(id, request.getEstado());
+        commandService.cambiarEstado(UUID.fromString(id), request.getEstado());
         return ResponseEntity.ok().build();
     }
 
@@ -91,7 +92,7 @@ public class CitaController {
     public ResponseEntity<List<DisponibilidadResponse>> disponibilidad(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam String tecnicoId) {
-        return ResponseEntity.ok(queryService.disponibilidad(fecha, tecnicoId));
+        return ResponseEntity.ok(queryService.disponibilidad(fecha, UUID.fromString(tecnicoId)));
     }
 
     @GetMapping("/notificaciones-config")

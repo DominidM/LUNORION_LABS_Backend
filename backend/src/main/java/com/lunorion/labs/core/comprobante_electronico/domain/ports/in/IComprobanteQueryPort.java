@@ -6,17 +6,19 @@ import com.lunorion.labs.core.comprobante_electronico.application.dto.out.PleRes
 import com.lunorion.labs.core.comprobante_electronico.application.dto.out.ReporteFacturacionResponse;
 import com.lunorion.labs.core.comprobante_electronico.application.dto.out.ResumenDiarioResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IComprobanteQueryPort {
-    Optional<ComprobanteResponse> findById(String id);
+    Optional<ComprobanteResponse> findById(UUID id);
     List<ComprobanteResponse> findByTenantId(String tenantId);
-    List<ComprobanteResponse> findByVentaId(String ventaId);
-    CdrResponse descargarCdr(String id);
-    String descargarXml(String id);
-    ReporteFacturacionResponse reporteFacturacion(String tenantId, String fechaInicio, String fechaFin);
-    Optional<ResumenDiarioResponse> estadoResumenDiario(String id);
+    List<ComprobanteResponse> findByVentaId(UUID ventaId);
+    CdrResponse descargarCdr(UUID id);
+    String descargarXml(UUID id);
+    ReporteFacturacionResponse reporteFacturacion(String tenantId, LocalDate fechaInicio, LocalDate fechaFin);
+    Optional<ResumenDiarioResponse> estadoResumenDiario(UUID id);
     PleResponse generarPle(String tenantId, String periodo);
-    PleResponse descargarPle(String id);
+    PleResponse descargarPle(UUID id);
 }

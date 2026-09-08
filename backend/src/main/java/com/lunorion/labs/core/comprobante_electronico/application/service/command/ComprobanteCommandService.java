@@ -12,6 +12,8 @@ import com.lunorion.labs.core.comprobante_electronico.domain.ports.out.IComproba
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @Transactional
 public class ComprobanteCommandService implements IComprobanteCommandPort {
@@ -38,7 +40,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     public ComprobanteResponse emitirBoleta(EmitirBoletaRequest request) {
         ComprobanteElectronico domain = ComprobanteElectronico.create(
                 request.getTenantId(),
-                request.getVentaId(),
+                UUID.fromString(request.getVentaId()),
                 "03",
                 request.getSerie(),
                 request.getNumero(),
@@ -47,7 +49,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
                 request.getMontoTotal(),
                 request.getRucCliente(),
                 request.getRazonSocialCliente(),
-                request.getEnviadoPorId()
+                UUID.fromString(request.getEnviadoPorId())
         );
         ComprobanteElectronico saved = repository.save(domain);
         return mapper.toResponse(saved);
@@ -57,7 +59,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     public ComprobanteResponse emitirNotaCredito(NotaCreditoRequest request) {
         ComprobanteElectronico domain = ComprobanteElectronico.create(
                 request.getTenantId(),
-                request.getVentaId(),
+                UUID.fromString(request.getVentaId()),
                 "07",
                 request.getSerie(),
                 request.getNumero(),
@@ -66,9 +68,9 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
                 request.getMontoTotal(),
                 request.getRucCliente(),
                 request.getRazonSocialCliente(),
-                request.getEnviadoPorId()
+                UUID.fromString(request.getEnviadoPorId())
         );
-        domain.setComprobanteReferenciaId(request.getComprobanteReferenciaId());
+        domain.setComprobanteReferenciaId(UUID.fromString(request.getComprobanteReferenciaId()));
         ComprobanteElectronico saved = repository.save(domain);
         return mapper.toResponse(saved);
     }
@@ -77,7 +79,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     public ComprobanteResponse emitirNotaDebito(NotaDebitoRequest request) {
         ComprobanteElectronico domain = ComprobanteElectronico.create(
                 request.getTenantId(),
-                request.getVentaId(),
+                UUID.fromString(request.getVentaId()),
                 "08",
                 request.getSerie(),
                 request.getNumero(),
@@ -86,15 +88,15 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
                 request.getMontoTotal(),
                 request.getRucCliente(),
                 request.getRazonSocialCliente(),
-                request.getEnviadoPorId()
+                UUID.fromString(request.getEnviadoPorId())
         );
-        domain.setComprobanteReferenciaId(request.getComprobanteReferenciaId());
+        domain.setComprobanteReferenciaId(UUID.fromString(request.getComprobanteReferenciaId()));
         ComprobanteElectronico saved = repository.save(domain);
         return mapper.toResponse(saved);
     }
 
     @Override
-    public void firmar(String id) {
+    public void firmar(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.firmar();
             repository.save(c);
@@ -102,7 +104,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     }
 
     @Override
-    public void enviarSunat(String id) {
+    public void enviarSunat(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.enviarSunat();
             repository.save(c);
@@ -110,7 +112,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     }
 
     @Override
-    public void aceptar(String id) {
+    public void aceptar(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.aceptar();
             repository.save(c);
@@ -118,7 +120,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     }
 
     @Override
-    public void rechazar(String id, String error) {
+    public void rechazar(UUID id, String error) {
         repository.findById(id).ifPresent(c -> {
             c.rechazar(error);
             repository.save(c);
@@ -126,7 +128,7 @@ public class ComprobanteCommandService implements IComprobanteCommandPort {
     }
 
     @Override
-    public void reenviar(String id) {
+    public void reenviar(UUID id) {
         repository.findById(id).ifPresent(c -> {
             c.enviarSunat();
             c.setCodigoErrorSunat(null);

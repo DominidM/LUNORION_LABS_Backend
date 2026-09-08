@@ -48,10 +48,10 @@ public class CierreCajaEntity {
     private String observacion;
 
     @Column(name = "usuario_apertura")
-    private String usuarioAperturaId;
+    private UUID usuarioAperturaId;
 
     @Column(name = "usuario_cierre")
-    private String usuarioCierreId;
+    private UUID usuarioCierreId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -85,10 +85,10 @@ public class CierreCajaEntity {
     public void setDescuadre(BigDecimal descuadre) { this.descuadre = descuadre; }
     public String getObservacion() { return observacion; }
     public void setObservacion(String observacion) { this.observacion = observacion; }
-    public String getUsuarioAperturaId() { return usuarioAperturaId; }
-    public void setUsuarioAperturaId(String usuarioAperturaId) { this.usuarioAperturaId = usuarioAperturaId; }
-    public String getUsuarioCierreId() { return usuarioCierreId; }
-    public void setUsuarioCierreId(String usuarioCierreId) { this.usuarioCierreId = usuarioCierreId; }
+    public UUID getUsuarioAperturaId() { return usuarioAperturaId; }
+    public void setUsuarioAperturaId(UUID usuarioAperturaId) { this.usuarioAperturaId = usuarioAperturaId; }
+    public UUID getUsuarioCierreId() { return usuarioCierreId; }
+    public void setUsuarioCierreId(UUID usuarioCierreId) { this.usuarioCierreId = usuarioCierreId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

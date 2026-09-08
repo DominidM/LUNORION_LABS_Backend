@@ -4,13 +4,14 @@ import com.lunorion.labs.shared.domain.BaseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
 public class ComprobanteElectronico extends BaseEntity {
 
     private String tenantId;
-    private String ventaId;
+    private UUID ventaId;
     private String tipo;
     private String serie;
     private int numero;
@@ -22,21 +23,21 @@ public class ComprobanteElectronico extends BaseEntity {
     private String estadoSunat;
     private String codigoErrorSunat;
     private String descripcionError;
-    private String comprobanteReferenciaId;
+    private UUID comprobanteReferenciaId;
     private BigDecimal montoOperacionesGravadas;
     private BigDecimal montoIgv;
     private BigDecimal montoTotal;
     private String rucCliente;
     private String razonSocialCliente;
     private int intentosEnvio;
-    private LocalTime ultimoEnvio;
-    private String enviadoPorId;
+    private LocalDateTime ultimoEnvio;
+    private UUID enviadoPorId;
 
     public ComprobanteElectronico() {}
 
-    public ComprobanteElectronico(UUID id, String tenantId, String ventaId, String tipo, String serie, int numero,
+    public ComprobanteElectronico(UUID id, String tenantId, UUID ventaId, String tipo, String serie, int numero,
                                   LocalDate fechaEmision, LocalTime horaEmision, BigDecimal montoTotal,
-                                  String rucCliente, String razonSocialCliente, String enviadoPorId) {
+                                  String rucCliente, String razonSocialCliente, UUID enviadoPorId) {
         super(id);
         this.tenantId = tenantId;
         this.ventaId = ventaId;
@@ -53,9 +54,9 @@ public class ComprobanteElectronico extends BaseEntity {
         this.intentosEnvio = 0;
     }
 
-    public static ComprobanteElectronico create(String tenantId, String ventaId, String tipo, String serie, int numero,
+    public static ComprobanteElectronico create(String tenantId, UUID ventaId, String tipo, String serie, int numero,
                                                 LocalDate fechaEmision, LocalTime horaEmision, BigDecimal montoTotal,
-                                                String rucCliente, String razonSocialCliente, String enviadoPorId) {
+                                                String rucCliente, String razonSocialCliente, UUID enviadoPorId) {
         return new ComprobanteElectronico(UUID.randomUUID(), tenantId, ventaId, tipo, serie, numero,
                 fechaEmision, horaEmision, montoTotal, rucCliente, razonSocialCliente, enviadoPorId);
     }
@@ -67,7 +68,7 @@ public class ComprobanteElectronico extends BaseEntity {
 
     public void enviarSunat() {
         this.intentosEnvio++;
-        this.ultimoEnvio = LocalTime.now();
+        this.ultimoEnvio = LocalDateTime.now();
         markUpdated();
     }
 
@@ -86,7 +87,7 @@ public class ComprobanteElectronico extends BaseEntity {
     }
 
     public String getTenantId() { return tenantId; }
-    public String getVentaId() { return ventaId; }
+    public UUID getVentaId() { return ventaId; }
     public String getTipo() { return tipo; }
     public String getSerie() { return serie; }
     public int getNumero() { return numero; }
@@ -103,8 +104,8 @@ public class ComprobanteElectronico extends BaseEntity {
     public void setCodigoErrorSunat(String codigoErrorSunat) { this.codigoErrorSunat = codigoErrorSunat; }
     public String getDescripcionError() { return descripcionError; }
     public void setDescripcionError(String descripcionError) { this.descripcionError = descripcionError; }
-    public String getComprobanteReferenciaId() { return comprobanteReferenciaId; }
-    public void setComprobanteReferenciaId(String comprobanteReferenciaId) { this.comprobanteReferenciaId = comprobanteReferenciaId; }
+    public UUID getComprobanteReferenciaId() { return comprobanteReferenciaId; }
+    public void setComprobanteReferenciaId(UUID comprobanteReferenciaId) { this.comprobanteReferenciaId = comprobanteReferenciaId; }
     public BigDecimal getMontoOperacionesGravadas() { return montoOperacionesGravadas; }
     public void setMontoOperacionesGravadas(BigDecimal montoOperacionesGravadas) { this.montoOperacionesGravadas = montoOperacionesGravadas; }
     public BigDecimal getMontoIgv() { return montoIgv; }
@@ -113,6 +114,6 @@ public class ComprobanteElectronico extends BaseEntity {
     public String getRucCliente() { return rucCliente; }
     public String getRazonSocialCliente() { return razonSocialCliente; }
     public int getIntentosEnvio() { return intentosEnvio; }
-    public LocalTime getUltimoEnvio() { return ultimoEnvio; }
-    public String getEnviadoPorId() { return enviadoPorId; }
+    public LocalDateTime getUltimoEnvio() { return ultimoEnvio; }
+    public UUID getEnviadoPorId() { return enviadoPorId; }
 }

@@ -35,7 +35,7 @@ public class MovimientoCajaEntity {
     private String concepto;
 
     @Column(name = "usuario_id")
-    private String usuarioId;
+    private UUID usuarioId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -61,8 +61,8 @@ public class MovimientoCajaEntity {
     public void setReferencia(String referencia) { this.referencia = referencia; }
     public String getConcepto() { return concepto; }
     public void setConcepto(String concepto) { this.concepto = concepto; }
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public UUID getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(UUID usuarioId) { this.usuarioId = usuarioId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

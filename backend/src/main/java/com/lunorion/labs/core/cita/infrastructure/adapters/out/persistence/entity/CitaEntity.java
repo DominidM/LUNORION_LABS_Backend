@@ -16,13 +16,13 @@ public class CitaEntity {
     private UUID tenantId;
 
     @Column(name = "cliente_id")
-    private String clienteId;
+    private UUID clienteId;
 
     @Column(name = "vehiculo_id")
-    private String vehiculoId;
+    private UUID vehiculoId;
 
     @Column(name = "tecnico_id")
-    private String tecnicoId;
+    private UUID tecnicoId;
 
     @Column(name = "servicio_descripcion", columnDefinition = "TEXT")
     private String servicioDescripcion;
@@ -43,7 +43,7 @@ public class CitaEntity {
     private Boolean notificarWhatsapp = false;
 
     @Column(name = "usuario_creo")
-    private String usuarioCreoId;
+    private UUID usuarioCreoId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -57,12 +57,12 @@ public class CitaEntity {
     public void setId(UUID id) { this.id = id; }
     public UUID getTenantId() { return tenantId; }
     public void setTenantId(UUID tenantId) { this.tenantId = tenantId; }
-    public String getClienteId() { return clienteId; }
-    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
-    public String getVehiculoId() { return vehiculoId; }
-    public void setVehiculoId(String vehiculoId) { this.vehiculoId = vehiculoId; }
-    public String getTecnicoId() { return tecnicoId; }
-    public void setTecnicoId(String tecnicoId) { this.tecnicoId = tecnicoId; }
+    public UUID getClienteId() { return clienteId; }
+    public void setClienteId(UUID clienteId) { this.clienteId = clienteId; }
+    public UUID getVehiculoId() { return vehiculoId; }
+    public void setVehiculoId(UUID vehiculoId) { this.vehiculoId = vehiculoId; }
+    public UUID getTecnicoId() { return tecnicoId; }
+    public void setTecnicoId(UUID tecnicoId) { this.tecnicoId = tecnicoId; }
     public String getServicioDescripcion() { return servicioDescripcion; }
     public void setServicioDescripcion(String servicioDescripcion) { this.servicioDescripcion = servicioDescripcion; }
     public LocalDateTime getFechaHora() { return fechaHora; }
@@ -75,8 +75,8 @@ public class CitaEntity {
     public void setRecordatorioEnviado(Boolean recordatorioEnviado) { this.recordatorioEnviado = recordatorioEnviado; }
     public Boolean getNotificarWhatsapp() { return notificarWhatsapp; }
     public void setNotificarWhatsapp(Boolean notificarWhatsapp) { this.notificarWhatsapp = notificarWhatsapp; }
-    public String getUsuarioCreoId() { return usuarioCreoId; }
-    public void setUsuarioCreoId(String usuarioCreoId) { this.usuarioCreoId = usuarioCreoId; }
+    public UUID getUsuarioCreoId() { return usuarioCreoId; }
+    public void setUsuarioCreoId(UUID usuarioCreoId) { this.usuarioCreoId = usuarioCreoId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
