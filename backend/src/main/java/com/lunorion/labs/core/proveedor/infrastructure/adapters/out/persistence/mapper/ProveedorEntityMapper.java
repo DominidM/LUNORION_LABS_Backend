@@ -29,6 +29,12 @@ public class ProveedorEntityMapper {
         if (entity == null) return null;
         Proveedor domain = new Proveedor(entity.getId(), entity.getTenantId().toString(),
                 entity.getRuc(), entity.getRazonSocial());
+        domain.setContacto(entity.getContacto());
+        domain.setTelefono(entity.getTelefono());
+        domain.setEmail(entity.getEmail());
+        domain.setDireccion(entity.getDireccion());
+        domain.setCondicionesPago(entity.getCondicionesPago());
+        domain.setActivo(entity.getActivo());
         domain.setCreatedAt(entity.getCreatedAt());
         return domain;
     }
