@@ -3,10 +3,20 @@ package com.lunorion.labs.core.orden_trabajo.infrastructure.adapters.out.persist
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OrdenTrabajo;
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OtInsumo;
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OtManoObra;
+import com.lunorion.labs.core.orden_trabajo.domain.filter.OrdenTrabajoFiltro;
 import com.lunorion.labs.core.orden_trabajo.domain.ports.out.IOrdenTrabajoRepositoryPort;
+import com.lunorion.labs.core.orden_trabajo.infrastructure.adapters.out.persistence.entity.OrdenTrabajoEntity;
 import com.lunorion.labs.core.orden_trabajo.infrastructure.adapters.out.persistence.mapper.OrdenTrabajoEntityMapper;
+import com.lunorion.labs.shared.domain.PageResult;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,6 +82,46 @@ public class OrdenTrabajoRepositoryAdapter implements IOrdenTrabajoRepositoryPor
         return jpaRepository.findAll().stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResult<OrdenTrabajo> search(OrdenTrabajoFiltro filtro) {
+        Pageable pageable = PageRequest.of(filtro.safePage(), filtro.safeSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<OrdenTrabajoEntity> page = jpaRepository.findAll(buildSpecification(filtro), pageable);
+        List<OrdenTrabajo> content = page.getContent().stream().map(mapper::toDomain).collect(Collectors.toList());
+        return new PageResult<>(content, page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.getTotalPages());
+    }
+
+    @Override
+    public List<OrdenTrabajo> searchAll(OrdenTrabajoFiltro filtro) {
+        return jpaRepository.findAll(buildSpecification(filtro), Sort.by(Sort.Direction.DESC, "createdAt"))
+                .stream().map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    private Specification<OrdenTrabajoEntity> buildSpecification(OrdenTrabajoFiltro filtro) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filtro.tenantId() != null && !filtro.tenantId().isBlank()) {
+                predicates.add(cb.equal(root.get("tenantId"), UUID.fromString(filtro.tenantId())));
+            }
+
+            if (filtro.search() != null && !filtro.search().isBlank()) {
+                String like = "%" + filtro.search().trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("numeroOt")), like),
+                        cb.like(cb.lower(root.get("motivoIngreso")), like)
+                ));
+            }
+
+            if (filtro.estado() != null && !filtro.estado().isBlank()) {
+                predicates.add(cb.equal(cb.upper(root.get("estado")), filtro.estado().trim().toUpperCase()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     @Override

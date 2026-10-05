@@ -27,6 +27,7 @@ public class UsuarioMapper {
         response.setNombres(usuario.getNombres());
         response.setApellidos(usuario.getApellidos());
         response.setDni(usuario.getDni());
+        response.setTelefono(usuario.getTelefono());
         response.setRol(usuario.getRol());
         response.setActivo(usuario.isActivo());
         return response;

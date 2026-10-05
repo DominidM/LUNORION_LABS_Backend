@@ -4,13 +4,19 @@ import com.lunorion.labs.core.orden_trabajo.application.dto.in.*;
 import com.lunorion.labs.core.orden_trabajo.application.dto.out.CierreOtResponse;
 import com.lunorion.labs.core.orden_trabajo.application.dto.out.KanbanResponse;
 import com.lunorion.labs.core.orden_trabajo.application.dto.out.OrdenTrabajoResponse;
+import com.lunorion.labs.core.orden_trabajo.domain.filter.OrdenTrabajoFiltro;
 import com.lunorion.labs.core.orden_trabajo.domain.ports.in.IOrdenTrabajoCommandPort;
 import com.lunorion.labs.core.orden_trabajo.domain.ports.in.IOrdenTrabajoQueryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
+import com.lunorion.labs.shared.application.export.ReportExporter;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ordenes-trabajo")
@@ -18,10 +24,13 @@ public class OrdenTrabajoController {
 
     private final IOrdenTrabajoCommandPort commandService;
     private final IOrdenTrabajoQueryPort queryService;
+    private final ReportExporter reportExporter;
 
-    public OrdenTrabajoController(IOrdenTrabajoCommandPort commandService, IOrdenTrabajoQueryPort queryService) {
+    public OrdenTrabajoController(IOrdenTrabajoCommandPort commandService, IOrdenTrabajoQueryPort queryService,
+                                  ReportExporter reportExporter) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.reportExporter = reportExporter;
     }
 
     @PostMapping
@@ -37,8 +46,37 @@ public class OrdenTrabajoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrdenTrabajoResponse>> findAll() {
-        return ResponseEntity.ok(queryService.findAll());
+    public ResponseEntity<PagedResponse<OrdenTrabajoResponse>> findAll(
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por N° de OT o motivo de ingreso") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado de la orden", schema = @Schema(allowableValues = {"PENDIENTE", "EN_PROCESO", "EN_REPARACION", "CERRADO"})) @RequestParam(required = false) String estado,
+            @Parameter(description = "Número de página (base 0)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Registros por página", schema = @Schema(type = "integer", allowableValues = {"5", "10", "25", "50"}, defaultValue = "10")) @RequestParam(defaultValue = "10") int size) {
+        OrdenTrabajoFiltro filtro = new OrdenTrabajoFiltro(tenantId, search, estado, page, size);
+        return ResponseEntity.ok(queryService.search(filtro));
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> export(
+            @Parameter(description = "Formato del archivo", schema = @Schema(allowableValues = {"XLSX", "PDF"}, defaultValue = "XLSX")) @RequestParam(defaultValue = "XLSX") String formato,
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por N° de OT o motivo de ingreso") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado de la orden", schema = @Schema(allowableValues = {"PENDIENTE", "EN_PROCESO", "EN_REPARACION", "CERRADO"})) @RequestParam(required = false) String estado) {
+        OrdenTrabajoFiltro filtro = new OrdenTrabajoFiltro(tenantId, search, estado, 0, 0);
+        List<OrdenTrabajoResponse> data = queryService.searchAll(filtro);
+        List<String> headers = List.of("N° OT", "Estado", "Motivo de ingreso", "Fecha prometida", "Total");
+        List<List<String>> rows = data.stream()
+                .map(ot -> List.of(
+                        ot.getNumeroOt() == null ? "" : ot.getNumeroOt(),
+                        ot.getEstado() == null ? "" : ot.getEstado(),
+                        ot.getMotivoIngreso() == null ? "" : ot.getMotivoIngreso(),
+                        ot.getFechaPrometida() == null ? "" : ot.getFechaPrometida().toString(),
+                        ot.getTotal() == null ? "" : ot.getTotal().toPlainString()))
+                .collect(Collectors.toList());
+        byte[] body = "PDF".equalsIgnoreCase(formato)
+                ? reportExporter.toPdf("Reporte de Órdenes de Trabajo", headers, rows)
+                : reportExporter.toXlsx("OrdenesTrabajo", headers, rows);
+        return reportExporter.respond(body, formato, "reporte_ordenes_trabajo");
     }
 
     @GetMapping("/tenant/{tenantId}")

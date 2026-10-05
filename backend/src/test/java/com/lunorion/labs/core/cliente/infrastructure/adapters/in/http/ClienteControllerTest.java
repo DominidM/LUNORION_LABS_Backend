@@ -3,8 +3,11 @@ package com.lunorion.labs.core.cliente.infrastructure.adapters.in.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lunorion.labs.core.cliente.application.dto.in.CreateClienteRequest;
 import com.lunorion.labs.core.cliente.application.dto.out.ClienteResponse;
+import com.lunorion.labs.core.cliente.domain.filter.ClienteFiltro;
 import com.lunorion.labs.core.cliente.domain.ports.in.IClienteCommandPort;
 import com.lunorion.labs.core.cliente.domain.ports.in.IClienteQueryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
+import com.lunorion.labs.shared.application.export.ReportExporter;
 import com.lunorion.labs.shared.infrastructure.security.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,6 +45,9 @@ class ClienteControllerTest {
 
     @MockBean
     private IClienteQueryPort queryService;
+
+    @MockBean
+    private ReportExporter reportExporter;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
@@ -159,16 +165,18 @@ class ClienteControllerTest {
     class FindAll {
 
         @Test
-        @DisplayName("debe retornar lista de clientes")
+        @DisplayName("debe retornar lista paginada de clientes")
         void shouldReturnAllClientes() throws Exception {
             ClienteResponse r1 = buildResponse("id-1");
             ClienteResponse r2 = buildResponse("id-2");
+            PagedResponse<ClienteResponse> paged = new PagedResponse<>(List.of(r1, r2), 0, 10, 2, 1);
 
-            when(queryService.findAll()).thenReturn(List.of(r1, r2));
+            when(queryService.search(any(ClienteFiltro.class))).thenReturn(paged);
 
             mockMvc.perform(get(BASE_URL))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(2));
+                    .andExpect(jsonPath("$.content.length()").value(2))
+                    .andExpect(jsonPath("$.totalElements").value(2));
         }
     }
 

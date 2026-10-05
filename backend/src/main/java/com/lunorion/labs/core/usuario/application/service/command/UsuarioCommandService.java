@@ -57,6 +57,14 @@ public class UsuarioCommandService implements IUsuarioCommandPort {
     }
 
     @Override
+    public void activar(String id) {
+        repository.findById(id).ifPresent(usuario -> {
+            usuario.activar();
+            repository.save(usuario);
+        });
+    }
+
+    @Override
     public void asignarPermisos(String usuarioId, AsignarPermisosRequest request) {
         UUID uid = UUID.fromString(usuarioId);
         usuarioPermisoJpaRepository.deleteByUsuarioId(uid);

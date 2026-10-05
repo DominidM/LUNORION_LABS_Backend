@@ -27,7 +27,10 @@ public class Usuario extends BaseEntity {
     }
 
     public static Usuario create(String tenantId, String email, String nombres, String apellidos, String dni, String telefono, String rol) {
-        return new Usuario(UUID.randomUUID(), tenantId, email, nombres, apellidos, rol);
+        Usuario usuario = new Usuario(UUID.randomUUID(), tenantId, email, nombres, apellidos, rol);
+        usuario.dni = dni;
+        usuario.telefono = telefono;
+        return usuario;
     }
 
     public void desactivar() { this.activo = false; markUpdated(); }
@@ -43,4 +46,10 @@ public class Usuario extends BaseEntity {
     public String getRol() { return rol; }
     public boolean isActivo() { return activo; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public void setDni(String dni) { this.dni = dni; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public void setEmail(String email) { this.email = email; }
+    public void setNombres(String nombres) { this.nombres = nombres; }
+    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+    public void setRol(String rol) { this.rol = rol; }
 }

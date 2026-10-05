@@ -7,5 +7,6 @@ import com.lunorion.labs.core.usuario.application.dto.out.UsuarioResponse;
 public interface IUsuarioCommandPort {
     UsuarioResponse create(CreateUsuarioRequest request);
     void desactivar(String id);
+    void activar(String id);
     void asignarPermisos(String usuarioId, AsignarPermisosRequest request);
 }
