@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public interface IClienteQueryPort {
     Optional<ClienteResponse> findById(String id);
-    Optional<ClienteResponse> findByNumeroDocumento(String numeroDocumento);
     List<ClienteResponse> findByTenantId(String tenantId);
     List<ClienteResponse> findAll();
     PagedResponse<ClienteResponse> search(ClienteFiltro filtro);

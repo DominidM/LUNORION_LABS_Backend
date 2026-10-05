@@ -46,11 +46,6 @@ public class ClienteQueryService implements IClienteQueryPort {
     }
 
     @Override
-    public Optional<ClienteResponse> findByNumeroDocumento(String numeroDocumento) {
-        return repository.findByNumeroDocumento(numeroDocumento).map(mapper::toResponse);
-    }
-
-    @Override
     public List<ClienteResponse> findByTenantId(String tenantId) {
         return repository.findByTenantId(tenantId).stream()
                 .map(mapper::toResponse)

@@ -9,9 +9,11 @@ import com.lunorion.labs.core.orden_trabajo.domain.ports.in.IOrdenTrabajoCommand
 import com.lunorion.labs.core.orden_trabajo.domain.ports.in.IOrdenTrabajoQueryPort;
 import com.lunorion.labs.shared.application.dto.out.PagedResponse;
 import com.lunorion.labs.shared.application.export.ReportExporter;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,16 +58,34 @@ public class OrdenTrabajoController {
         return ResponseEntity.ok(queryService.search(filtro));
     }
 
-    @GetMapping("/export")
-    public ResponseEntity<byte[]> export(
-            @Parameter(description = "Formato del archivo", schema = @Schema(allowableValues = {"XLSX", "PDF"}, defaultValue = "XLSX")) @RequestParam(defaultValue = "XLSX") String formato,
+    @GetMapping(value = "/export/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @Operation(summary = "Exportar órdenes de trabajo a PDF", description = "Exporta el listado filtrado en formato PDF")
+    public ResponseEntity<byte[]> exportPdf(
             @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
             @Parameter(description = "Búsqueda por N° de OT o motivo de ingreso") @RequestParam(required = false) String search,
             @Parameter(description = "Estado de la orden", schema = @Schema(allowableValues = {"PENDIENTE", "EN_PROCESO", "EN_REPARACION", "CERRADO"})) @RequestParam(required = false) String estado) {
+        byte[] body = reportExporter.toPdf("Reporte de Órdenes de Trabajo", EXPORT_HEADERS,
+                buildExportRows(tenantId, search, estado));
+        return reportExporter.pdfResponse(body, "reporte_ordenes_trabajo");
+    }
+
+    @GetMapping(value = "/export/excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    @Operation(summary = "Exportar órdenes de trabajo a Excel", description = "Exporta el listado filtrado en formato Excel (XLSX)")
+    public ResponseEntity<byte[]> exportExcel(
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por N° de OT o motivo de ingreso") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado de la orden", schema = @Schema(allowableValues = {"PENDIENTE", "EN_PROCESO", "EN_REPARACION", "CERRADO"})) @RequestParam(required = false) String estado) {
+        byte[] body = reportExporter.toXlsx("OrdenesTrabajo", EXPORT_HEADERS,
+                buildExportRows(tenantId, search, estado));
+        return reportExporter.xlsxResponse(body, "reporte_ordenes_trabajo");
+    }
+
+    private static final List<String> EXPORT_HEADERS =
+            List.of("N° OT", "Estado", "Motivo de ingreso", "Fecha prometida", "Total");
+
+    private List<List<String>> buildExportRows(String tenantId, String search, String estado) {
         OrdenTrabajoFiltro filtro = new OrdenTrabajoFiltro(tenantId, search, estado, 0, 0);
-        List<OrdenTrabajoResponse> data = queryService.searchAll(filtro);
-        List<String> headers = List.of("N° OT", "Estado", "Motivo de ingreso", "Fecha prometida", "Total");
-        List<List<String>> rows = data.stream()
+        return queryService.searchAll(filtro).stream()
                 .map(ot -> List.of(
                         ot.getNumeroOt() == null ? "" : ot.getNumeroOt(),
                         ot.getEstado() == null ? "" : ot.getEstado(),
@@ -73,10 +93,6 @@ public class OrdenTrabajoController {
                         ot.getFechaPrometida() == null ? "" : ot.getFechaPrometida().toString(),
                         ot.getTotal() == null ? "" : ot.getTotal().toPlainString()))
                 .collect(Collectors.toList());
-        byte[] body = "PDF".equalsIgnoreCase(formato)
-                ? reportExporter.toPdf("Reporte de Órdenes de Trabajo", headers, rows)
-                : reportExporter.toXlsx("OrdenesTrabajo", headers, rows);
-        return reportExporter.respond(body, formato, "reporte_ordenes_trabajo");
     }
 
     @GetMapping("/tenant/{tenantId}")

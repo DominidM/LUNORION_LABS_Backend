@@ -112,15 +112,17 @@ public class ReportExporter {
         return base + "_" + LocalDateTime.now().format(TIMESTAMP) + ".pdf";
     }
 
-    public ResponseEntity<byte[]> respond(byte[] body, String formato, String baseName) {
-        boolean pdf = "PDF".equalsIgnoreCase(formato);
-        MediaType mediaType = pdf
-                ? MediaType.APPLICATION_PDF
-                : MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        String filename = pdf ? pdfFilename(baseName) : xlsxFilename(baseName);
+    public ResponseEntity<byte[]> pdfResponse(byte[] body, String baseName) {
         return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdfFilename(baseName) + "\"")
+                .body(body);
+    }
+
+    public ResponseEntity<byte[]> xlsxResponse(byte[] body, String baseName) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + xlsxFilename(baseName) + "\"")
                 .body(body);
     }
 }

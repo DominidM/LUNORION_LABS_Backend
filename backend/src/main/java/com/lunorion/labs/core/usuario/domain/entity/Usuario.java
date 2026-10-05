@@ -52,4 +52,5 @@ public class Usuario extends BaseEntity {
     public void setNombres(String nombres) { this.nombres = nombres; }
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
     public void setRol(String rol) { this.rol = rol; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }
