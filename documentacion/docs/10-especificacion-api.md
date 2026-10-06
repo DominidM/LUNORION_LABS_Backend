@@ -13,9 +13,12 @@ Endpoints REST + operaciones SOAP para facturación electrónica SUNAT.
 | **Autenticación** | JWT en header `Authorization: Bearer <token>` |
 | **Content-Type** | `application/json` (REST) / `text/xml` (SOAP) |
 | **Idioma** | Códigos de error en español |
-| **Paginación** | `?page=0&size=20&sort=createdAt,desc` |
+| **Paginación** | `?page=0&size=10`. `size` solo acepta **5, 10, 25 o 50** (default 10). Respuesta: `{content,page,size,totalElements,totalPages}` |
 | **Tenant ID** | Se extrae del JWT, no se envía en el body |
 | **Auditoría** | Todos los POST/PUT/PATCH generan registro en `auditoria` |
+
+> ⚠️ **Rutas del diseño vs. implementación.** Las rutas en inglés de este documento (`/customers`, `/work-orders`, `/products`, `/sales`, `/invoices`, `/quotes`, `/vehicles`, `/appointments`, `/checkins`, `/cash-register`, `/technicians`, `/payroll`, `/admin/...`) son el **diseño** (API pública v1). El backend implementado usa rutas en español bajo `/api`:
+> `/api/clientes`, `/api/usuarios`, `/api/ordenes-trabajo`, `/api/productos`, `/api/ventas`, `/api/cotizaciones`, `/api/auth`, etc. Ver *Endpoints implementados* más abajo.
 
 ---
 
@@ -60,6 +63,80 @@ Response 200:
 ### POST /auth/refresh
 
 Refresca el token antes de que expire.
+
+> ⚠️ Implementación real: el backend obtiene el token del header `Authorization`, no del body `{ refreshToken }`.
+
+---
+
+## Endpoints Implementados (estado real)
+
+Endpoints implementados hoy en el backend (Spring Boot). Todos bajo `/api` y requieren JWT (`Authorization: Bearer <token>`).
+
+### Autenticación (`/api/auth`)
+
+| Método | Path | Descripción |
+|:---|:---|:---|
+| `POST` | `/api/auth/login` | Login → JWT + datos de usuario y tenant |
+| `POST` | `/api/auth/refresh` | Renueva el token (lee el token del header `Authorization`) |
+
+> ❌ No implementados: `/auth/profile`, `/auth/register`, `/auth/logout`.
+
+### Clientes (`/api/clientes`)
+
+| Método | Path | Descripción |
+|:---|:---|:---|
+| `GET` | `/api/clientes` | Listado paginado. Filtros: `page`, `size`, `search`, `estado` (`activo`/`inactivo`), `tipoDocumento`, `tenantId` |
+| `GET` | `/api/clientes/{id}` | Detalle |
+| `POST` | `/api/clientes` | Crear |
+| `PUT` | `/api/clientes/{id}` | Actualizar |
+| `POST` | `/api/clientes/{id}/activar` · `/desactivar` | Activar / desactivar |
+| `GET` | `/api/clientes/tenant/{tenantId}` | Clientes por tenant |
+| `GET` | `/api/clientes/{id}/historial-trabajos` · `/{id}/historial-compras` · `/{id}/rentabilidad` | Reportes del cliente |
+| `GET` | `/api/clientes/export/pdf` | Export PDF (mismos filtros) |
+| `GET` | `/api/clientes/export/excel` | Export Excel |
+
+> ❌ Eliminado: `GET /api/clientes/documento/{numero}` (reemplazado por el filtro `search`).
+
+### Usuarios / Empleados (`/api/usuarios`)
+
+| Método | Path | Descripción |
+|:---|:---|:---|
+| `GET` | `/api/usuarios` | Listado paginado. Filtros: `page`, `size`, `search`, `rol`, `estado`, `tenantId` |
+| `POST` | `/api/usuarios` | Crear |
+| `GET` | `/api/usuarios/{id}` | Detalle |
+| `PUT` | `/api/usuarios/{id}` | Actualizar |
+| `POST` | `/api/usuarios/{id}/activar` · `/desactivar` | Activar / desactivar |
+| `GET` | `/api/usuarios/roles` | Roles asignables según el rol del solicitante |
+| `GET` | `/api/usuarios/permisos` | Catálogo de permisos (⚠️ hoy solo 3 en BD) |
+| `PUT` | `/api/usuarios/{id}/permisos` | Asignar permisos (PBAC) |
+| `GET` | `/api/usuarios/tenant/{tenantId}` | Usuarios por tenant |
+| `GET` | `/api/usuarios/export/pdf` · `/export/excel` | Export |
+
+> `@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")` a nivel de controlador. Roles asignables: SUPER_ADMIN→todos, ADMIN→{ADMIN, PUBLIC}, PUBLIC→{}.
+
+### Órdenes de Trabajo (`/api/ordenes-trabajo`)
+
+| Método | Path | Descripción |
+|:---|:---|:---|
+| `GET` | `/api/ordenes-trabajo` | Listado paginado. Filtros: `page`, `size`, `search`, `estado`, `tenantId` |
+| `POST` | `/api/ordenes-trabajo` | Crear |
+| `GET` | `/api/ordenes-trabajo/{id}` | Detalle |
+| `PUT` | `/api/ordenes-trabajo/{id}` | Actualizar |
+| `DELETE` | `/api/ordenes-trabajo/{id}` | Eliminar |
+| `PATCH` | `/api/ordenes-trabajo/{id}/estado` | Cambiar estado |
+| `POST` | `/api/ordenes-trabajo/{id}/insumos` · `/{id}/labor` | Agregar insumo / mano de obra |
+| `POST` | `/api/ordenes-trabajo/{id}/cerrar` · `/{id}/reabrir` | Cerrar / reabrir |
+| `GET` | `/api/ordenes-trabajo/kanban` | Tablero Kanban |
+| `GET` | `/api/ordenes-trabajo/tenant/{tenantId}` | OT por tenant |
+| `GET` | `/api/ordenes-trabajo/export/pdf` · `/export/excel` | Export |
+
+> Estados válidos: `PENDIENTE`, `EN_PROCESO`, `EN_REPARACION`, `CERRADO`.
+
+### Seguridad global
+
+- `/api/auth/**`, `/ws/**` y Swagger son públicos.
+- El resto de `/api/**` exige autenticación (JWT).
+- Respuesta 401 en JSON.
 
 ---
 
@@ -374,7 +451,7 @@ Refresca el token antes de que expire.
 |:---|:---|:---|:---|
 | `GET` | `/dashboard/kpis` | `DASHBOARD_VER_KPIS` | KPIs en tiempo real |
 | `GET` | `/dashboard/profitability` | `REPORTE_VER_RENTABILIDAD` | Rentabilidad por servicio |
-| `GET` | `/dashboard/export` | `REPORTE_EXPORTAR` | Exportar reporte (?formato=EXCEL|PDF) |
+| `GET` | `/dashboard/export` | `REPORTE_EXPORTAR` | Exportar reporte. ⚠️ Diseño desactualizado: el patrón implementado usa un endpoint **por formato** (`…/export/pdf` y `…/export/excel`), no `?formato=` |
 
 ---
 

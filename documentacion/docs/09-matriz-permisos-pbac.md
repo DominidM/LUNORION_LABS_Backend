@@ -2,6 +2,12 @@
 
 Control de Acceso Basado en Permisos. Cada operación del sistema requiere un permiso específico. Los permisos se asignan **individualmente a cada usuario**, no por roles fijos.
 
+> ⚠️ **Estado real (2026-10-05):** este documento es el **diseño**. En la práctica:
+> - La tabla `permiso` de `lunorion_db` contiene solo **3** registros: `VER_CLIENTES`, `VER_OT`, `VER_VEHICULOS` (y esos códigos no aparecen en el catálogo de abajo).
+> - El **PBAC aún no se aplica en los endpoints**: la única autorización real es por **rol** (`@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")` en `UsuarioController`). El resto de endpoints solo exige estar autenticado.
+> - El JWT sí transporta `rol` y `permisos`, y `BcryptAdapter` los carga desde `usuario_permiso`, pero no se usan todavía en `@PreAuthorize`.
+> - El seed crea usuarios con rol `MECANICO` y `CAJERO`, que **no existen** en el catálogo de roles descrito abajo (deberían ser `PUBLIC` con permisos).
+
 ---
 
 ## Roles del Sistema
@@ -15,6 +21,8 @@ Existen 3 niveles. Todo el control fino se maneja asignando permisos específico
 | **Público** | `PUBLIC` | Por tenant | Cliente del servicio — empleado del taller (cajero, técnico, vendedor, recepcionista, asesor). Solo accede a los permisos que el ADMIN del taller le asigne. |
 
 No hay roles predefinidos como "CAJERO" o "TECNICO". Cada usuario PUBLIC puede tener **cualquier combinación de permisos** según lo que el ADMIN del taller le configure.
+
+> ⚠️ Aunque el diseño define solo `SUPER_ADMIN`/`ADMIN`/`PUBLIC`, el seed actual inserta usuarios con `rol = 'MECANICO'` y `'CAJERO'`. Como `usuario.rol` es un `VARCHAR(12)` libre, la BD no lo impide. Deben migrarse a `PUBLIC` + permisos.
 
 ---
 
@@ -237,4 +245,22 @@ public ResponseEntity<InvoiceResponse> emitInvoice(...) {
 
 ---
 
-**Total: 65 permisos en el catálogo**
+**Total del diseño: 65 permisos en el catálogo**
+
+---
+
+## Estado de Implementación (2026-10-05)
+
+| Aspecto | Diseño | Realidad en `lunorion_db` |
+|:---|:---|:---|
+| Permisos en catálogo | 65 (P-01…P-65) | **3**: `VER_CLIENTES`, `VER_OT`, `VER_VEHICULOS` |
+| Nomenclatura | Códigos `MODULO_ACCION` | Los 3 cargados **no coinciden** con el catálogo de arriba |
+| Enforcement | `@PreAuthorize("hasAuthority('...')")` por endpoint | ❌ No aplicado (salvo `hasAnyRole(...)` en `UsuarioController`) |
+| Transporte | Permisos en el JWT | ✅ `JwtTokenProvider` agrega los claims `rol` y `permisos` (cargados por `BcryptAdapter` desde `usuario_permiso`), pero no se evalúan |
+| Roles de usuario | `SUPER_ADMIN` / `ADMIN` / `PUBLIC` | ⚠️ Datos con `MECANICO` / `CAJERO` (permitido por `VARCHAR(12)`, pero fuera del diseño) |
+
+**Pendientes para activar el PBAC:**
+1. Poblar `permiso` con el catálogo de 65 (o reconciliar los 3 códigos existentes).
+2. Reemplazar `hasAnyRole(...)` por `hasAuthority('<PERMISO>')` en cada controlador.
+3. Migrar los usuarios `MECANICO`/`CAJERO` a `PUBLIC` + filas en `usuario_permiso`.
+4. Agregar `UNIQUE(usuario_id, permiso_id)` (ver `08-modelo-de-datos.md`).

@@ -4,6 +4,8 @@ Flujos críticos del sistema con énfasis en procesos legales (facturación SUNA
 
 Los diagramas están escritos en PlantUML. Renderizar en https://www.plantuml.com/plantuml/uml/ o IDE con plugin.
 
+> ⚠️ Las rutas REST de los diagramas usan la nomenclatura de **diseño** (`/sales`, `/work-orders`, `/invoices/...`). El backend implementado expone rutas en español bajo `/api` (ver `10-especificacion-api.md`). Los estados de OT usados abajo (`EN_PROCESO`, `EN_REPARACION`, `CERRADO`) son los que valida el código.
+
 ---
 
 ## 1. Facturación Electrónica — Ciclo Completo (SOAP)
@@ -116,13 +118,13 @@ sist -> db: Actualizar OT (tecnicoId, servicios)
 
 == 3. Ejecutar OT ==
 tec -> sist: VER TABLERO KANBAN /topic/work-orders/kanban
-tec -> sist: INICIAR OT (estado: EN_PROGRESO)
+tec -> sist: INICIAR OT (estado: EN_PROCESO)
 loop Durante la reparación
   tec -> sist: AGREGAR INSUMO consumido
   sist -> db: Descontar stock + registrar en OT
   tec -> sist: REGISTRAR HORAS de mano de obra
 end
-tec -> sist: MARCAR OT COMO "EN REVISIÓN"
+tec -> sist: MARCAR OT COMO "EN REPARACIÓN" (EN_REPARACION)
 
 == 4. Cierre de OT ==
 recep -> sist: CERRAR OT
@@ -321,7 +323,7 @@ db --> sist: OT original con datos
 asesor -> sist: REABRIR OT (otOriginalId, motivo)
 sist -> sist: Validar que OT original existe y está cerrada
 sist -> db: Crear OT_garantía con referencia a original
-sist -> db: Estado OT_garantía: EN_PROGRESO
+sist -> db: Estado OT_garantía: EN_PROCESO
 sist -> db: Registrar en garantia (motivo, costos en 0)
 
 == 3. Ejecutar Servicio en Garantía ==
