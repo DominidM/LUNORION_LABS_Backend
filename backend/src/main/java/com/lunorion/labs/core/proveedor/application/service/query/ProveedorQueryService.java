@@ -2,8 +2,10 @@ package com.lunorion.labs.core.proveedor.application.service.query;
 
 import com.lunorion.labs.core.proveedor.application.dto.out.ProveedorResponse;
 import com.lunorion.labs.core.proveedor.application.mapper.ProveedorMapper;
+import com.lunorion.labs.core.proveedor.domain.filter.ProveedorFiltro;
 import com.lunorion.labs.core.proveedor.domain.ports.in.IProveedorQueryPort;
 import com.lunorion.labs.core.proveedor.domain.ports.out.IProveedorRepositoryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,5 +42,10 @@ public class ProveedorQueryService implements IProveedorQueryPort {
         return repository.findAll().stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PagedResponse<ProveedorResponse> search(ProveedorFiltro filtro) {
+        return PagedResponse.from(repository.search(filtro), mapper::toResponse);
     }
 }

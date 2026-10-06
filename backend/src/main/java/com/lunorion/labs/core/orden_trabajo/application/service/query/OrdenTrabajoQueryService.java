@@ -4,8 +4,10 @@ import com.lunorion.labs.core.orden_trabajo.application.dto.out.KanbanResponse;
 import com.lunorion.labs.core.orden_trabajo.application.dto.out.KanbanResponse.OrdenTrabajoResumen;
 import com.lunorion.labs.core.orden_trabajo.application.dto.out.OrdenTrabajoResponse;
 import com.lunorion.labs.core.orden_trabajo.application.mapper.OrdenTrabajoMapper;
+import com.lunorion.labs.core.orden_trabajo.domain.filter.OrdenTrabajoFiltro;
 import com.lunorion.labs.core.orden_trabajo.domain.ports.in.IOrdenTrabajoQueryPort;
 import com.lunorion.labs.core.orden_trabajo.domain.ports.out.IOrdenTrabajoRepositoryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,18 @@ public class OrdenTrabajoQueryService implements IOrdenTrabajoQueryPort {
     @Override
     public List<OrdenTrabajoResponse> findAll() {
         return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PagedResponse<OrdenTrabajoResponse> search(OrdenTrabajoFiltro filtro) {
+        return PagedResponse.from(repository.search(filtro), mapper::toResponse);
+    }
+
+    @Override
+    public List<OrdenTrabajoResponse> searchAll(OrdenTrabajoFiltro filtro) {
+        return repository.searchAll(filtro).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }

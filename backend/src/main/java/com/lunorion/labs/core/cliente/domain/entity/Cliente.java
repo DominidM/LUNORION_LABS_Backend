@@ -42,6 +42,7 @@ public class Cliente extends BaseEntity {
     public void setDireccion(String direccion) { this.direccion = direccion; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public void setEmail(String email) { this.email = email; }
+    public void setActivo(boolean activo) { this.activo = activo; }
     public void desactivar() { this.activo = false; markUpdated(); }
     public void activar() { this.activo = true; markUpdated(); }
     public void actualizar() { markUpdated(); }

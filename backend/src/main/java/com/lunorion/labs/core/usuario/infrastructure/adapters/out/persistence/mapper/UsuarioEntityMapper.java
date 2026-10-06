@@ -27,6 +27,9 @@ public class UsuarioEntityMapper {
         if (entity == null) return null;
         Usuario domain = new Usuario(entity.getId(), entity.getTenantId().toString(), entity.getEmail(),
                 entity.getNombres(), entity.getApellidos(), entity.getRol());
+        domain.setDni(entity.getDni());
+        domain.setTelefono(entity.getTelefono());
+        domain.setActivo(entity.getActivo() == null || entity.getActivo());
         domain.setPasswordHash(entity.getPasswordHash());
         domain.setCreatedAt(entity.getCreatedAt());
         return domain;

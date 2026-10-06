@@ -1,6 +1,8 @@
 package com.lunorion.labs.core.proveedor.domain.ports.out;
 
 import com.lunorion.labs.core.proveedor.domain.entity.Proveedor;
+import com.lunorion.labs.core.proveedor.domain.filter.ProveedorFiltro;
+import com.lunorion.labs.shared.domain.PageResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,4 +12,5 @@ public interface IProveedorRepositoryPort {
     Optional<Proveedor> findById(String id);
     List<Proveedor> findByTenantId(String tenantId);
     List<Proveedor> findAll();
+    PageResult<Proveedor> search(ProveedorFiltro filtro);
 }

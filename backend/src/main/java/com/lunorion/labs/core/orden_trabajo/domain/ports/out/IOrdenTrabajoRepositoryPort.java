@@ -3,6 +3,8 @@ package com.lunorion.labs.core.orden_trabajo.domain.ports.out;
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OrdenTrabajo;
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OtInsumo;
 import com.lunorion.labs.core.orden_trabajo.domain.entity.OtManoObra;
+import com.lunorion.labs.core.orden_trabajo.domain.filter.OrdenTrabajoFiltro;
+import com.lunorion.labs.shared.domain.PageResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,8 @@ public interface IOrdenTrabajoRepositoryPort {
     List<OrdenTrabajo> findByTenantId(String tenantId);
     List<OrdenTrabajo> findByEstado(String estado, String tenantId);
     List<OrdenTrabajo> findAll();
+    PageResult<OrdenTrabajo> search(OrdenTrabajoFiltro filtro);
+    List<OrdenTrabajo> searchAll(OrdenTrabajoFiltro filtro);
     OrdenTrabajo save(OrdenTrabajo ordenTrabajo);
     void deleteById(String id);
     void saveAllInsumos(List<OtInsumo> insumos);

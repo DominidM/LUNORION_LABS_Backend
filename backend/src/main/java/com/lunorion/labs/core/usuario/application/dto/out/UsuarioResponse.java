@@ -6,6 +6,7 @@ public class UsuarioResponse {
     private String nombres;
     private String apellidos;
     private String dni;
+    private String telefono;
     private String rol;
     private boolean activo;
 
@@ -19,6 +20,8 @@ public class UsuarioResponse {
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
     public String getDni() { return dni; }
     public void setDni(String dni) { this.dni = dni; }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
     public boolean isActivo() { return activo; }

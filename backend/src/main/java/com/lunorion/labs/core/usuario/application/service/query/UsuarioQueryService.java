@@ -3,9 +3,11 @@ package com.lunorion.labs.core.usuario.application.service.query;
 import com.lunorion.labs.core.usuario.application.dto.out.PermisoResponse;
 import com.lunorion.labs.core.usuario.application.dto.out.UsuarioResponse;
 import com.lunorion.labs.core.usuario.application.mapper.UsuarioMapper;
+import com.lunorion.labs.core.usuario.domain.filter.UsuarioFiltro;
 import com.lunorion.labs.core.usuario.domain.ports.in.IUsuarioQueryPort;
 import com.lunorion.labs.core.usuario.domain.ports.out.IPermisoRepositoryPort;
 import com.lunorion.labs.core.usuario.domain.ports.out.IUsuarioRepositoryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,18 @@ public class UsuarioQueryService implements IUsuarioQueryPort {
     @Override
     public List<UsuarioResponse> findByTenantId(String tenantId) {
         return repository.findByTenantId(tenantId).stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PagedResponse<UsuarioResponse> search(UsuarioFiltro filtro) {
+        return PagedResponse.from(repository.search(filtro), mapper::toResponse);
+    }
+
+    @Override
+    public List<UsuarioResponse> searchAll(UsuarioFiltro filtro) {
+        return repository.searchAll(filtro).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }

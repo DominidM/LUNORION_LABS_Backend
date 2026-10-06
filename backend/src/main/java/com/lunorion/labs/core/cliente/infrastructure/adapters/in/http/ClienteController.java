@@ -5,15 +5,22 @@ import com.lunorion.labs.core.cliente.application.dto.out.ClienteResponse;
 import com.lunorion.labs.core.cliente.application.dto.out.HistorialCompraResponse;
 import com.lunorion.labs.core.cliente.application.dto.out.HistorialTrabajoResponse;
 import com.lunorion.labs.core.cliente.application.dto.out.RentabilidadClienteResponse;
+import com.lunorion.labs.core.cliente.domain.filter.ClienteFiltro;
 import com.lunorion.labs.core.cliente.domain.ports.in.IClienteCommandPort;
 import com.lunorion.labs.core.cliente.domain.ports.in.IClienteQueryPort;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
+import com.lunorion.labs.shared.application.export.ReportExporter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -22,10 +29,13 @@ public class ClienteController {
 
     private final IClienteCommandPort commandService;
     private final IClienteQueryPort queryService;
+    private final ReportExporter reportExporter;
 
-    public ClienteController(IClienteCommandPort commandService, IClienteQueryPort queryService) {
+    public ClienteController(IClienteCommandPort commandService, IClienteQueryPort queryService,
+                             ReportExporter reportExporter) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.reportExporter = reportExporter;
     }
 
     @PostMapping
@@ -49,17 +59,62 @@ public class ClienteController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar clientes", description = "Retorna todos los clientes registrados")
-    public ResponseEntity<List<ClienteResponse>> findAll() {
-        return ResponseEntity.ok(queryService.findAll());
+    @Operation(summary = "Listar clientes", description = "Retorna los clientes de forma paginada, con búsqueda y filtros")
+    public ResponseEntity<PagedResponse<ClienteResponse>> findAll(
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por nombre, documento, teléfono, email o razón social") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado del cliente", schema = @Schema(allowableValues = {"activo", "inactivo"})) @RequestParam(required = false) String estado,
+            @Parameter(description = "Tipo de documento", schema = @Schema(allowableValues = {"DNI", "RUC", "CE"})) @RequestParam(required = false) String tipoDocumento,
+            @Parameter(description = "Número de página (base 0)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Registros por página", schema = @Schema(type = "integer", allowableValues = {"5", "10", "25", "50"}, defaultValue = "10")) @RequestParam(defaultValue = "10") int size) {
+        ClienteFiltro filtro = new ClienteFiltro(tenantId, search, estado, tipoDocumento, page, size);
+        return ResponseEntity.ok(queryService.search(filtro));
     }
 
-    @GetMapping("/documento/{numero}")
-    @Operation(summary = "Buscar cliente por documento", description = "Retorna un cliente por su número de documento")
-    public ResponseEntity<ClienteResponse> findByNumeroDocumento(@PathVariable String numero) {
-        return queryService.findByNumeroDocumento(numero)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping(value = "/export/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @Operation(summary = "Exportar clientes a PDF", description = "Exporta el listado filtrado en formato PDF")
+    public ResponseEntity<byte[]> exportPdf(
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por nombre, documento, teléfono, email o razón social") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado del cliente", schema = @Schema(allowableValues = {"activo", "inactivo"})) @RequestParam(required = false) String estado,
+            @Parameter(description = "Tipo de documento", schema = @Schema(allowableValues = {"DNI", "RUC", "CE"})) @RequestParam(required = false) String tipoDocumento) {
+        byte[] body = reportExporter.toPdf("Reporte de Clientes", EXPORT_HEADERS,
+                buildExportRows(tenantId, search, estado, tipoDocumento));
+        return reportExporter.pdfResponse(body, "reporte_clientes");
+    }
+
+    @GetMapping(value = "/export/excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    @Operation(summary = "Exportar clientes a Excel", description = "Exporta el listado filtrado en formato Excel (XLSX)")
+    public ResponseEntity<byte[]> exportExcel(
+            @Parameter(description = "ID del tenant (opcional)") @RequestParam(required = false) String tenantId,
+            @Parameter(description = "Búsqueda por nombre, documento, teléfono, email o razón social") @RequestParam(required = false) String search,
+            @Parameter(description = "Estado del cliente", schema = @Schema(allowableValues = {"activo", "inactivo"})) @RequestParam(required = false) String estado,
+            @Parameter(description = "Tipo de documento", schema = @Schema(allowableValues = {"DNI", "RUC", "CE"})) @RequestParam(required = false) String tipoDocumento) {
+        byte[] body = reportExporter.toXlsx("Clientes", EXPORT_HEADERS,
+                buildExportRows(tenantId, search, estado, tipoDocumento));
+        return reportExporter.xlsxResponse(body, "reporte_clientes");
+    }
+
+    private static final List<String> EXPORT_HEADERS =
+            List.of("Cliente", "Documento", "Teléfono", "Email", "Estado");
+
+    private List<List<String>> buildExportRows(String tenantId, String search, String estado, String tipoDocumento) {
+        ClienteFiltro filtro = new ClienteFiltro(tenantId, search, estado, tipoDocumento, 0, 0);
+        return queryService.searchAll(filtro).stream()
+                .map(c -> List.of(
+                        nombreCompleto(c),
+                        ((c.getTipoDocumento() == null ? "" : c.getTipoDocumento() + " ")
+                                + (c.getNumeroDocumento() == null ? "" : c.getNumeroDocumento())).trim(),
+                        c.getTelefono() == null ? "" : c.getTelefono(),
+                        c.getEmail() == null ? "" : c.getEmail(),
+                        c.isActivo() ? "Activo" : "Inactivo"))
+                .collect(Collectors.toList());
+    }
+
+    private String nombreCompleto(ClienteResponse c) {
+        String nombres = c.getNombres() == null ? "" : c.getNombres();
+        String apellidos = c.getApellidos() == null ? "" : c.getApellidos();
+        return (nombres + " " + apellidos).trim();
     }
 
     @GetMapping("/tenant/{tenantId}")

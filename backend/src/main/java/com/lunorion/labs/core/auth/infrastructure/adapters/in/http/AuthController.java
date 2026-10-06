@@ -3,11 +3,13 @@ package com.lunorion.labs.core.auth.infrastructure.adapters.in.http;
 import com.lunorion.labs.core.auth.application.dto.in.LoginRequest;
 import com.lunorion.labs.core.auth.application.dto.out.LoginResponse;
 import com.lunorion.labs.core.auth.domain.ports.in.ILoginPort;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@SecurityRequirements
 public class AuthController {
 
     private final ILoginPort loginPort;

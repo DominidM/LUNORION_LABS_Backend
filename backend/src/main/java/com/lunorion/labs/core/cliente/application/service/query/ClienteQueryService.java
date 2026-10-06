@@ -5,12 +5,14 @@ import com.lunorion.labs.core.cliente.application.dto.out.HistorialCompraRespons
 import com.lunorion.labs.core.cliente.application.dto.out.HistorialTrabajoResponse;
 import com.lunorion.labs.core.cliente.application.dto.out.RentabilidadClienteResponse;
 import com.lunorion.labs.core.cliente.application.mapper.ClienteMapper;
+import com.lunorion.labs.core.cliente.domain.filter.ClienteFiltro;
 import com.lunorion.labs.core.cliente.domain.ports.in.IClienteQueryPort;
 import com.lunorion.labs.core.cliente.domain.ports.out.IClienteRepositoryPort;
 import com.lunorion.labs.core.orden_trabajo.infrastructure.adapters.out.persistence.entity.OrdenTrabajoEntity;
 import com.lunorion.labs.core.orden_trabajo.infrastructure.adapters.out.persistence.repository.OrdenTrabajoJpaRepository;
 import com.lunorion.labs.core.venta.infrastructure.adapters.out.persistence.entity.VentaEntity;
 import com.lunorion.labs.core.venta.infrastructure.adapters.out.persistence.repository.VentaJpaRepository;
+import com.lunorion.labs.shared.application.dto.out.PagedResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +46,6 @@ public class ClienteQueryService implements IClienteQueryPort {
     }
 
     @Override
-    public Optional<ClienteResponse> findByNumeroDocumento(String numeroDocumento) {
-        return repository.findByNumeroDocumento(numeroDocumento).map(mapper::toResponse);
-    }
-
-    @Override
     public List<ClienteResponse> findByTenantId(String tenantId) {
         return repository.findByTenantId(tenantId).stream()
                 .map(mapper::toResponse)
@@ -58,6 +55,18 @@ public class ClienteQueryService implements IClienteQueryPort {
     @Override
     public List<ClienteResponse> findAll() {
         return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PagedResponse<ClienteResponse> search(ClienteFiltro filtro) {
+        return PagedResponse.from(repository.search(filtro), mapper::toResponse);
+    }
+
+    @Override
+    public List<ClienteResponse> searchAll(ClienteFiltro filtro) {
+        return repository.searchAll(filtro).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }

@@ -2,6 +2,8 @@
 
 Diagrama de entidades, relaciones y campos obligatorios, incluyendo campos legales (SUNAT, PLAME, PLE, auditoría).
 
+> **Sincronizado con la BD real** (`lunorion_db`, PostgreSQL): **34 tablas**, **77 FKs**, **10 constraints UNIQUE**. Última revisión: 2026-10-05. Los gaps entre el diseño y la implementación se detallan al final en *Estado de implementación y Gaps*.
+
 ---
 
 ## Diagrama DER (PlantUML)
@@ -45,7 +47,7 @@ class tenant {
 class usuario {
   + id: UUID <<PK>>
   + tenant_id: UUID <<FK>>
-  + email: VARCHAR(100) <<UNIQUE>>
+  + email: VARCHAR(100) <<UNIQUE global>>
   + password_hash: TEXT
   + nombres: VARCHAR(100)
   + apellidos: VARCHAR(100)
@@ -117,7 +119,7 @@ class movimiento_stock {
   + costo_unitario: DECIMAL(10,2)
   + stock_anterior: DECIMAL(10,2)
   + stock_posterior: DECIMAL(10,2)
-  + documento_origen: VARCHAR(50) // id de OT, venta, compra
+  + documento_origen: VARCHAR(100) // id de OT, venta, compra
   + tipo_documento_origen: VARCHAR(30) // OT, SALE, PURCHASE
   + observacion: TEXT
   + usuario_id: UUID <<FK>>
@@ -168,7 +170,7 @@ class cliente {
   + id: UUID <<PK>>
   + tenant_id: UUID <<FK>>
   + tipo_documento: VARCHAR(3) // DNI, RUC, CE
-  + numero_documento: VARCHAR(15) <<UNIQUE>>
+  + numero_documento: VARCHAR(20) <<UNIQUE global>>
   + nombres: VARCHAR(100)
   + apellidos: VARCHAR(100)
   + razon_social: VARCHAR(200)
@@ -284,7 +286,7 @@ class orden_trabajo {
   + vehiculo_id: UUID <<FK>>
   + tecnico_id: UUID <<FK>>
   + numero_ot: VARCHAR(20) <<UNIQUE>>
-  + estado: VARCHAR(20) // PENDIENTE, EN_PROGRESO, EN_REVISION, CERRADO, REABIERTO
+  + estado: VARCHAR(20) // PENDIENTE, EN_PROCESO, EN_REPARACION, CERRADO (validado por el código)
   + motivo_ingreso: TEXT
   + kilometraje_ingreso: INTEGER
   + fecha_ingreso: TIMESTAMP
@@ -508,6 +510,35 @@ class garantia {
 }
 
 ' ============================================
+' COTIZACIONES
+' ============================================
+class cotizacion {
+  + id: UUID <<PK>>
+  + tenant_id: UUID <<FK>>
+  + cliente_id: UUID <<FK>>
+  + vehiculo_id: UUID <<FK>> // opcional
+  + fecha_emision: DATE
+  + fecha_validez: DATE
+  + estado: VARCHAR(20)
+  + subtotal: NUMERIC
+  + igv: NUMERIC
+  + total: NUMERIC
+  + notas: TEXT
+  + activo: BOOLEAN
+  + created_at: TIMESTAMP
+  + updated_at: TIMESTAMP
+}
+
+class cotizacion_item {
+  + id: UUID <<PK>>
+  + cotizacion_id: UUID <<FK>>
+  + descripcion: VARCHAR(255) // texto libre: NO enlaza a producto
+  + cantidad: INTEGER
+  + precio_unitario: NUMERIC
+  + subtotal: NUMERIC
+}
+
+' ============================================
 ' RELACIONES
 ' ============================================
 
@@ -525,10 +556,42 @@ tenant ||--o{ boleta_pago : "1:N"
 tenant ||--o{ asistencia : "1:N"
 tenant ||--o{ auditoria : "1:N"
 tenant ||--o{ proveedor : "1:N"
+tenant ||--o{ categoria_producto : "1:N"
+tenant ||--o{ vehiculo : "1:N"
+tenant ||--o{ venta : "1:N"
+tenant ||--o{ orden_compra : "1:N"
+tenant ||--o{ tecnico : "1:N"
+tenant ||--o{ resumen_diario : "1:N"
+tenant ||--o{ movimiento_caja : "1:N"
+tenant ||--o{ ple_generado : "1:N"
+tenant ||--o{ configuracion_comision : "1:N"
+tenant ||--o{ garantia : "1:N"
+tenant ||--o{ cotizacion : "1:N"
 
 ' Permisos (PBAC directo)
 usuario ||--o{ usuario_permiso : "1:N"
 permiso ||--o{ usuario_permiso : "1:N"
+
+' Referencias a usuario (usuario_id / usuario_creo / usuario_cerro / enviado_por)
+usuario ||--o{ movimiento_stock : "registra"
+usuario ||--o{ orden_compra : "crea"
+usuario ||--o{ venta : "registra"
+usuario ||--o{ orden_trabajo : "usuario_creo"
+usuario ||--o{ orden_trabajo : "usuario_cerro"
+usuario ||--o{ checkin : "registra"
+usuario ||--o{ cita : "usuario_creo"
+usuario ||--o{ garantia : "registra"
+usuario ||--o{ auditoria : "ejecuta"
+usuario ||--o{ ple_generado : "genera"
+usuario ||--o{ cierre_caja : "usuario_apertura"
+usuario ||--o{ cierre_caja : "usuario_cierre"
+usuario ||--o{ movimiento_caja : "registra"
+usuario ||--o{ comprobante_electronico : "enviado_por"
+
+' Cotizaciones
+cliente ||--o{ cotizacion : "1:N"
+vehiculo ||--o{ cotizacion : "N:1 opcional"
+cotizacion ||--o{ cotizacion_item : "1:N"
 
 ' Productos
 categoria_producto ||--o{ producto : "1:N"
@@ -549,7 +612,7 @@ cliente ||--o{ checkin : "1:N"
 
 ' Ventas y comprobantes
 venta ||--o{ venta_item : "1:N"
-venta ||--o{ comprobante_electronico : "1:1"
+venta ||--o{ comprobante_electronico : "1:N"
 venta_item }o--|| producto : "N:1"
 comprobante_electronico ||--o{ resumen_diario_item : "1:N"
 resumen_diario ||--o{ resumen_diario_item : "1:N"
@@ -565,7 +628,7 @@ ot_mano_obra }o--|| tecnico : "N:1"
 
 ' Check-in
 checkin ||--o{ checkin_foto : "1:N"
-checkin }o--|| orden_trabajo : "1:1"
+checkin }o--|| orden_trabajo : "N:1 opcional"
 
 ' Garantías
 orden_trabajo ||--o{ garantia : "ot_original"
@@ -623,7 +686,7 @@ Usuarios del sistema que operan dentro de un tenant.
 |:---|:---|:---:|:---|
 | `id` | UUID | | |
 | `tenant_id` | UUID | ✅ | Relación con tenant |
-| `email` | VARCHAR(100) | | Email de login (único por tenant) |
+| `email` | VARCHAR(100) | | Email de login. ⚠️ El constraint es `UNIQUE` **global**, no por tenant (ver Gaps) |
 | `password_hash` | TEXT | ✅ | Hash bcrypt/argon2 |
 | `nombres` | VARCHAR(100) | | |
 | `apellidos` | VARCHAR(100) | | |
@@ -646,7 +709,7 @@ Sistema PBAC puro. No existen roles fijos. Cada usuario tiene permisos asignados
 - `VENTA_EMITIR_FACTURA`
 - `OT_CREAR`
 - `CAJA_EJECUTAR_CIERRE`
-- etc. (65 permisos en total)
+- etc. (catálogo **diseñado** de 65 permisos; ver `09-matriz-permisos-pbac.md` para el estado real: solo 3 cargados en BD)
 
 ---
 
@@ -704,7 +767,7 @@ Entidad más importante del módulo legal. Cada fila es un comprobante enviado (
 | `ultimo_envio` | TIMESTAMP | | Timestamp del último intento |
 
 **Reglas de negocio:**
-- Serie + número + tenant_id = único
+- Serie + número + tenant_id = único ⚠️ **No implementado**: no existe constraint `UNIQUE` en `comprobante_electronico`
 - Una vez ACEPTADO, no se puede modificar
 - Si RECHAZADO, se crea un nuevo registro corregido
 - NC/ND deben referenciar un comprobante ACEPTADO
@@ -721,7 +784,7 @@ Agrupa las boletas (tipo 03) del día para envío a SUNAT al día siguiente.
 | Campo OT | Tipo | Legal | Descripción |
 |:---|:---|:---:|:---|
 | `numero_ot` | VARCHAR(20) | | Correlativo por tenant |
-| `estado` | VARCHAR(20) | ✅ | PENDIENTE, EN_PROGRESO, EN_REVISION, CERRADO, REABIERTO |
+| `estado` | VARCHAR(20) | ✅ | PENDIENTE, EN_PROCESO, EN_REPARACION, CERRADO (validado en `OrdenTrabajoQueryService`). ⚠️ Los datos actuales contienen `COMPLETADA`, que es inválido |
 | `fecha_ingreso` | TIMESTAMP | ✅ | Para trazabilidad |
 | `total_repuestos` | DECIMAL(10,2) | ✅ | Suma de insumos |
 | `total_mano_obra` | DECIMAL(10,2) | ✅ | Suma de horas × tarifa |
@@ -772,12 +835,14 @@ Traza de todas las operaciones críticas. **Solo INSERT, nunca UPDATE ni DELETE.
 | Convención | Regla |
 |:---|:---|
 | **IDs** | UUID v4 (no autoincrementales) |
-| **tenant_id** | Presente en TODAS las tablas de negocio |
+| **tenant_id** | Presente en todas las tablas **raíz** de negocio. Las tablas hijas (`ot_insumo`, `ot_mano_obra`, `venta_item`, `orden_compra_item`, `comprobante_electronico`, `resumen_diario_item`, `checkin_foto`, `cotizacion_item`) no lo llevan |
 | **Auditoría** | `created_at` en todas las tablas |
 | **Soft delete** | No se eliminan registros. Se marcan como `activo = false` |
 | **Campos legales** | No permiten UPDATE después de emitidos (inmutabilidad) |
 | **Índices** | (tenant_id, created_at DESC), (tenant_id, estado) en tablas críticas |
 | **Decimales** | DECIMAL(10,2) para montos, DECIMAL(5,2) para porcentajes |
+| **Uniques** | ⚠️ `usuario.email`, `cliente.numero_documento`, `vehiculo.placa`, `producto.codigo`, `tenant.ruc`, `tecnico.usuario_id` son `UNIQUE` **globales** (no compuestos con `tenant_id`). Impacta el modelo multitenant — ver Gaps |
+| **Faltantes** | No existe `UNIQUE(usuario_id, permiso_id)` en `usuario_permiso` ni `UNIQUE(serie, numero, tenant_id)` en `comprobante_electronico` |
 
 ---
 
@@ -790,3 +855,21 @@ Traza de todas las operaciones críticas. **Solo INSERT, nunca UPDATE ni DELETE.
 | `v_carga_tecnico` | Horas asignadas vs disponibles por técnico |
 | `v_rentabilidad_cliente` | Cliente, total facturado, total costos, margen |
 | `v_productividad_rrhh` | Horas asistencia vs horas OT por técnico por mes |
+
+---
+
+## Estado de implementación y Gaps
+
+Verificado contra `lunorion_db` el 2026-10-05.
+
+| # | Tema | Estado |
+|:---|:---|:---|
+| 1 | `cotizacion` / `cotizacion_item` | ✅ Existen en BD y en el código (`core.cotizacion`). ❌ **No están en `init.sql`** → un `init` fresco no las crea. `cotizacion_item` guarda `descripcion` de texto libre, **sin `producto_id`** |
+| 2 | Permisos | ⚠️ Catálogo diseñado = 65 (`09`); cargados en BD = **3** (`VER_CLIENTES`, `VER_OT`, `VER_VEHICULOS`), que **ni siquiera existen en el catálogo de 65** |
+| 3 | Estados de OT | ⚠️ Código valida `PENDIENTE, EN_PROCESO, EN_REPARACION, CERRADO`; los datos contienen `COMPLETADA` (inválido) |
+| 4 | Uniques globales | ⚠️ `usuario.email`, `cliente.numero_documento`, `vehiculo.placa`, `producto.codigo` son `UNIQUE` globales → dos tenants no pueden repetir email/DNI/placa/código |
+| 5 | `usuario_permiso` | ❌ Falta `UNIQUE(usuario_id, permiso_id)` → permite permisos duplicados |
+| 6 | `comprobante_electronico` | ⚠️ La regla "serie + número + tenant_id único" **no está implementada** |
+| 7 | Cardinalidades | Corregidas en el DER: `venta→comprobante` es 1:N; `checkin→OT` es N:1 opcional; `orden_trabajo.tecnico_id` es opcional |
+| 8 | Drift de tipos | ⚠️ `movimiento_stock.documento_origen` = `VARCHAR(100)` y `cliente.numero_documento` = `VARCHAR(20)` en BD (distintos de `init.sql`) |
+| 9 | Vistas maestras | ❌ No implementadas en BD |

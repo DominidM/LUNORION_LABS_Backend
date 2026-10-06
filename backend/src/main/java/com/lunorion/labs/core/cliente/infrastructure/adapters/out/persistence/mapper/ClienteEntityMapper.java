@@ -34,6 +34,7 @@ public class ClienteEntityMapper {
         domain.setDireccion(entity.getDireccion());
         domain.setTelefono(entity.getTelefono());
         domain.setEmail(entity.getEmail());
+        domain.setActivo(entity.getActivo() == null || entity.getActivo());
         domain.setCreatedAt(entity.getCreatedAt());
         domain.setUpdatedAt(entity.getUpdatedAt());
         return domain;

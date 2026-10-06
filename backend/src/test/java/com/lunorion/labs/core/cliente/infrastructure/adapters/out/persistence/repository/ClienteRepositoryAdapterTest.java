@@ -104,6 +104,24 @@ class ClienteRepositoryAdapterTest {
 
             assertThat(found).isEmpty();
         }
+
+        @Test
+        @DisplayName("debe mapear activo=false desde la entidad")
+        void shouldMapInactiveCliente() {
+            ClienteEntity inactivo = new ClienteEntity();
+            inactivo.setTenantId(tenantId);
+            inactivo.setTipoDocumento("DNI");
+            inactivo.setNumeroDocumento("11112222");
+            inactivo.setNombres("Inactivo");
+            inactivo.setApellidos("Test");
+            inactivo.setActivo(false);
+            inactivo = entityManager.persistAndFlush(inactivo);
+
+            Optional<Cliente> found = adapter.findById(inactivo.getId().toString());
+
+            assertThat(found).isPresent();
+            assertThat(found.get().isActivo()).isFalse();
+        }
     }
 
     @Nested

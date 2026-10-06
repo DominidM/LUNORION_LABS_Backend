@@ -1,5 +1,7 @@
 # Arquitectura Detallada — LUNORION LABS
 
+> ⚠️ **Este documento describe la arquitectura de diseño.** El estado real de implementación (paquetes, seguridad por tenant, stack) se marca con ⚠️/❌ en las secciones **3, 8 y 11**. El backend actual es un monolito **Spring Boot 3.3.5** con paquetes `core/`, `integration/` y `shared/`, sin API Gateway ni microservicios.
+
 ---
 
 ## 1. Arquitectura Hexagonal (Puertos y Adaptadores)
@@ -294,6 +296,21 @@ com.lunorion.labs
     └── config/                              ← ApplicationProperties, TenantInterceptor, Jackson
 ```
 
+> ⚠️ **Estructura real implementada.** Los nombres en inglés de arriba son el **diseño**. El código usa **español** con esta topología:
+>
+> ```
+> com.lunorion.labs
+> ├── core/           ← 19 slices: auth, caja, checkin, cita, cliente,
+> │                     comprobante_electronico, cotizacion, dashboard, inventario,
+> │                     orden_trabajo, ordencompra, planilla, producto, proveedor,
+> │                     tecnico, tenant, usuario, vehiculo, venta
+> ├── integration/    ← gmail, reniec, sunat
+> ├── shared/         ← application, domain, infrastructure, util
+> └── LunorionLabsApplication.java
+> ```
+>
+> No existe un paquete `kernel/`; su rol lo cumplen `shared/` (dominio/infra transversal) y `core/`.
+
 ---
 
 ## 4. Diagrama de Deployment
@@ -376,6 +393,8 @@ com.lunorion.labs
 ---
 
 ## 6. Flujo de un Request (Ejemplo: Crear OT)
+
+> ⚠️ Ejemplo de **diseño**. La ruta real es `POST /api/ordenes-trabajo` y el `@PreAuthorize("OT_CREAR")` de abajo aún **no existe**: la autorización implementada es por rol. Tampoco hay API Gateway: el filtro JWT corre dentro del propio Spring Boot. La escritura de paths en español bajo `/api` es la implementación real.
 
 ```
 Angular                     API Gateway            Módulo OT                    PostgreSQL
@@ -477,7 +496,7 @@ src/
 │                    JWT Token                        │
 │  {                                                  │
 │    "sub": "uuid-usuario",                          │
-│    "tenant_id": "uuid-tenant",                     │
+│    "tenantId": "uuid-tenant",                      │
 │    "rol": "ADMIN",                                 │
 │    "permisos": ["INVENTARIO_VER_STOCK", ...],      │
 │    "exp": 1700000000                               │
@@ -502,6 +521,13 @@ src/
 | **Base de datos** | Una DB por tenant. Aislamiento total pero operación compleja. |
 
 **Elección:** Aislamiento **por fila** (row-level security) con `tenant_id` en cada tabla. Usamos Spring `@Filter` + `TenantContext` (ThreadLocal).
+
+> ⚠️ **Estado real.** El aislamiento por fila **no está implementado aún** vía Hibernate:
+> - Existe `shared/util/TenantContext.java` (ThreadLocal) pero **no se usa** en ningún punto del código.
+> - No hay `@Filter`/`TenantFilter` de Hibernate aplicado.
+> - La autenticación real la hace `shared/infrastructure/security/JwtAuthenticationFilter` (valida el JWT y puebla el `SecurityContext`).
+> - El filtrado por tenant es **manual**: los endpoints de listado aceptan `tenantId` como filtro opcional, no lo fuerzan desde el JWT.
+> - **Riesgo:** sin forzar el `tenantId` del JWT, un usuario autenticado podría consultar datos de otro tenant. Pendiente.
 
 ---
 
@@ -543,7 +569,7 @@ src/
 | Aspecto | Estrategia |
 |:---|:---|
 | **Caching** | Redis para catálogos (productos, categorías, clientes frecuentes). TTL configurable. |
-| **Paginación** | Obligatoria en todos los listados. Tamaño default 20, máximo 100. |
+| **Paginación** | Obligatoria en todos los listados. Tamaño default **10**; valores permitidos **5, 10, 25, 50**. |
 | **Índices** | `(tenant_id, created_at DESC)` en tablas transaccionales. `(tenant_id, codigo)` en catálogos. |
 | **N+1 Queries** | Usar `@EntityGraph` o `JOIN FETCH` explícito. Prohibido `FetchType.EAGER` global. |
 | **Timeouts** | SOAP SUNAT: 10s connect + 30s read. DB: 5s query timeout. REST: 30s default. |
@@ -555,21 +581,26 @@ src/
 
 ## 11. Stack de Dependencias (Backend)
 
-| Dependencia | Versión | Propósito |
-|:---|:---|:---|
-| Spring Boot | 3.2+ | Framework base |
-| Spring Web | 3.2+ | REST Controllers |
-| Spring Security | 6.x | JWT + PBAC |
-| Spring Data JPA | 3.2+ | Persistencia |
-| Spring Web Services | 4.x | Cliente SOAP SUNAT |
-| Spring WebSocket | 6.x | STOMP + SockJS |
-| PostgreSQL Driver | 42.x | Driver JDBC |
-| Flyway | 10.x | Migraciones DB |
-| JJWT (io.jsonwebtoken) | 0.12.x | Generación JWT |
-| OpenPDF | 2.x | PDF (actas, boletas, cotizaciones) |
-| Apache Santuario | 3.x | Firma XML (XAdES) |
-| Lombok | — | Reducir boilerplate |
-| MapStruct | 1.6.x | Mapeo DTO ↔ Entidad |
-| Redis (Spring Data Redis) | — | Caché y rate limiting |
-| Testcontainers | — | Tests de integración |
-| OpenAPI (SpringDoc) | 2.x | Documentación API |
+| Dependencia | Versión real | Propósito | Estado |
+|:---|:---|:---|:---|
+| Spring Boot | 3.3.5 | Framework base | ✅ |
+| Spring Web | 3.3.5 | REST Controllers | ✅ |
+| Spring Security | 6.x | JWT + PBAC | ⚠️ Solo JWT; el PBAC no está aplicado |
+| Spring Data JPA | 3.3.5 | Persistencia | ✅ |
+| Spring Web Services | 4.x | Cliente SOAP SUNAT | ❌ No incluido (existe `integration/sunat`, sin Spring WS) |
+| Spring WebSocket | 6.x | STOMP + SockJS | ✅ |
+| PostgreSQL Driver | 42.x | Driver JDBC | ✅ |
+| Flyway | 10.x | Migraciones DB | ❌ No usado (`init.sql` / `seed.sql` manuales) |
+| JJWT (io.jsonwebtoken) | 0.12.6 | Generación JWT | ✅ |
+| OpenPDF | 2.0.3 | PDF | ✅ |
+| Apache POI | 5.3.0 | Excel (XLSX) | ✅ (para los exports) |
+| Apache Santuario | 3.x | Firma XML (XAdES) | ❌ No incluido |
+| Lombok | — | Reducir boilerplate | ✅ |
+| MapStruct | 1.6.x | Mapeo DTO ↔ Entidad | ❌ No usado (mappers manuales) |
+| Redis (Spring Data Redis) | — | Caché y rate limiting | ❌ No usado |
+| spring-dotenv | 4.0.0 | Cargar `.env` | ✅ |
+| Testcontainers | — | Tests de integración | ❌ No usado (H2 para tests) |
+| OpenAPI (SpringDoc) | 2.6.0 | Documentación API | ✅ |
+| JaCoCo | 0.8.12 | Cobertura de tests | ✅ |
+
+> **Stack realmente implementado:** Spring Boot 3.3.5 + Spring Web/JPA/Security/Validation/WebSocket + PostgreSQL + JJWT 0.12.6 + OpenPDF 2.0.3 + Apache POI 5.3.0 + springdoc 2.6.0 + spring-dotenv + Lombok; tests con JUnit 5, Mockito, AssertJ y H2. **No** se usan Flyway, MapStruct, Spring WS, Redis ni Testcontainers.
